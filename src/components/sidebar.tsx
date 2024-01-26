@@ -9,23 +9,25 @@ import {
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import {
-  FaCar,
-  FaCarSide,
   FaCirclePlus,
-  FaDatabase,
   FaFlipboard,
   FaListOl,
+  FaTableCells,
+  FaDiagramProject,
 } from 'react-icons/fa6';
+import { IoCellularSharp } from 'react-icons/io5';
+import { HiUser } from 'react-icons/hi2';
 import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { Link, useLocation } from 'react-router-dom';
 
 enum Title {
   Dashboard,
-  CanData,
-  Vehicles,
-  Register,
-  Types,
-  RegisterType,
+  StatisticsProject,
+  StatisticsEmployee,
+  Projects,
+  RegisterProject,
+  Employees,
+  RegisterEmployee,
   Edit,
 }
 
@@ -35,24 +37,26 @@ export default function Sidebar() {
   const [currentTitle, setCurrentTitle] = useState<Title>(
     url.pathname === '/'
       ? Title.Dashboard
-      : url.pathname === '/candata'
-      ? Title.CanData
-      : url.pathname === '/vehicles'
-      ? Title.Vehicles
-      : url.pathname === '/register'
-      ? Title.Register
-      : url.pathname === '/register/vtype'
-      ? Title.RegisterType
-      : url.pathname === '/vtypes'
-      ? Title.Types
-      : Title.Edit
+      : url.pathname === '/statistics/projects'
+      ? Title.StatisticsProject
+      : url.pathname === '/statistics/employee'
+      ? Title.StatisticsEmployee
+      : url.pathname === '/projects'
+      ? Title.Projects
+      : url.pathname === '/projects/register'
+      ? Title.RegisterProject
+      : url.pathname === '/employees'
+      ? Title.Employees
+      : Title.RegisterEmployee
   );
-  const [isOpen, setIsOpen] = useState<boolean>(
-    currentTitle === Title.Vehicles || currentTitle === Title.Register
+  const [isManageProjectsOpen, setIsManageProjectsOpen] = useState<boolean>(
+    currentTitle === Title.Projects || currentTitle === Title.RegisterProject
   );
-  const [isTypeOpen, setIsTypeOpen] = useState<boolean>(
-    currentTitle === Title.Types || currentTitle === Title.RegisterType
-  );
+  const [isManagementEmployeesOpen, setIsManagementEmployeesOpen] =
+    useState<boolean>(
+      currentTitle === Title.Employees ||
+        currentTitle === Title.RegisterEmployee
+    );
 
   return (
     <Skeleton
@@ -94,33 +98,36 @@ export default function Sidebar() {
               <Icon as={FaFlipboard} />
               <Text ml={3}>대시보드</Text>
             </Link>
+
             <Link
-              to={'/candata'}
-              onClick={() => setCurrentTitle(Title.CanData)}
+              to={'/statistics/projects'}
+              onClick={() => setCurrentTitle(Title.StatisticsProject)}
               className={
-                currentTitle === Title.CanData
+                currentTitle === Title.StatisticsProject
                   ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
                   : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
               }
             >
-              <Icon as={FaDatabase} />
+              <Icon as={FaTableCells} />
               <Text ml={3}>프로젝트 별 사원 투입현황</Text>
             </Link>
+
             <Link
-              to={'/candata'}
-              onClick={() => setCurrentTitle(Title.CanData)}
+              to={'/statistics/employee'}
+              onClick={() => setCurrentTitle(Title.StatisticsEmployee)}
               className={
-                currentTitle === Title.CanData
+                currentTitle === Title.StatisticsEmployee
                   ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
                   : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
               }
             >
-              <Icon as={FaDatabase} />
+              <Icon as={IoCellularSharp} />
               <Text ml={3}>사원별 프로젝트 수행현황</Text>
             </Link>
+
             <VStack w={'full'}>
               <Flex
-                onClick={() => setIsOpen((prev) => !prev)}
+                onClick={() => setIsManageProjectsOpen((prev) => !prev)}
                 cursor={'pointer'}
                 alignItems={'center'}
                 justifyContent={'space-between'}
@@ -132,93 +139,101 @@ export default function Sidebar() {
                 className=" transition duration-75 group hover:bg-gray-400"
               >
                 <Flex alignItems={'center'}>
-                  <Icon as={FaCar} />
+                  <Icon as={FaDiagramProject} />
                   <Text ml={3} textAlign={'left'} whiteSpace={'nowrap'}>
                     프로젝트 관리
                   </Text>
                 </Flex>
-                {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                {isManageProjectsOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
               </Flex>
-              {isOpen && (
-                <ScaleFade in={isOpen} initialScale={0.9} className="w-full">
-                  <VStack spacing={2} pl={6}>
-                    <Link
-                      to={'/vehicles'}
-                      onClick={() => setCurrentTitle(Title.Vehicles)}
-                      className={
-                        currentTitle === Title.Vehicles
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
-                      }
-                    >
-                      <Icon as={FaListOl} />
-                      <Text ml={3}>Vehicles</Text>
-                    </Link>
-                    <Link
-                      to={'/register'}
-                      onClick={() => setCurrentTitle(Title.Register)}
-                      className={
-                        currentTitle === Title.Register
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
-                      }
-                    >
-                      <Icon as={FaCirclePlus} />
-                      <Text ml={3}>Register Vehicle</Text>
-                    </Link>
-                  </VStack>
-                </ScaleFade>
-              )}
-              <Flex
-                onClick={() => setIsTypeOpen((prev) => !prev)}
-                cursor={'pointer'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                w={'full'}
-                p={2}
-                fontSize={'1rem'}
-                lineHeight={'1.5rem'}
-                rounded={'lg'}
-                className=" transition duration-75 group hover:bg-gray-400"
-              >
-                <Flex alignItems={'center'}>
-                  <Icon as={FaCarSide} />
-                  <Text ml={3} textAlign={'left'} whiteSpace={'nowrap'}>
-                    사원 관리
-                  </Text>
-                </Flex>
-                {isTypeOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-              </Flex>
-              {isTypeOpen && (
+              {isManageProjectsOpen && (
                 <ScaleFade
-                  in={isTypeOpen}
+                  in={isManageProjectsOpen}
                   initialScale={0.9}
                   className="w-full"
                 >
                   <VStack spacing={2} pl={6}>
                     <Link
-                      to={'/vtypes'}
-                      onClick={() => setCurrentTitle(Title.Types)}
+                      to={'/projects'}
+                      onClick={() => setCurrentTitle(Title.Projects)}
                       className={
-                        currentTitle === Title.Types
+                        currentTitle === Title.Projects
                           ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
                           : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
                       }
                     >
                       <Icon as={FaListOl} />
-                      <Text ml={3}>Types</Text>
+                      <Text ml={3}>프로젝트 리스트</Text>
                     </Link>
                     <Link
-                      to={'/register/vtype'}
-                      onClick={() => setCurrentTitle(Title.RegisterType)}
+                      to={'/projects/register'}
+                      onClick={() => setCurrentTitle(Title.RegisterProject)}
                       className={
-                        currentTitle === Title.RegisterType
+                        currentTitle === Title.RegisterProject
                           ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
                           : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
                       }
                     >
                       <Icon as={FaCirclePlus} />
-                      <Text ml={3}>Register Type</Text>
+                      <Text ml={3}>프로젝트 등록</Text>
+                    </Link>
+                  </VStack>
+                </ScaleFade>
+              )}
+              <Flex
+                onClick={() => setIsManagementEmployeesOpen((prev) => !prev)}
+                cursor={'pointer'}
+                alignItems={'center'}
+                justifyContent={'space-between'}
+                w={'full'}
+                p={2}
+                fontSize={'1rem'}
+                lineHeight={'1.5rem'}
+                rounded={'lg'}
+                className=" transition duration-75 group hover:bg-gray-400"
+              >
+                <Flex alignItems={'center'}>
+                  <Icon as={HiUser} />
+                  <Text ml={3} textAlign={'left'} whiteSpace={'nowrap'}>
+                    사원 관리
+                  </Text>
+                </Flex>
+                {isManagementEmployeesOpen ? (
+                  <ChevronUpIcon />
+                ) : (
+                  <ChevronDownIcon />
+                )}
+              </Flex>
+              {isManagementEmployeesOpen && (
+                <ScaleFade
+                  in={isManagementEmployeesOpen}
+                  initialScale={0.9}
+                  className="w-full"
+                >
+                  <VStack spacing={2} pl={6}>
+                    <Link
+                      to={'/employees'}
+                      onClick={() => setCurrentTitle(Title.Employees)}
+                      className={
+                        currentTitle === Title.Employees
+                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
+                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                      }
+                    >
+                      <Icon as={FaListOl} />
+                      <Text ml={3}>사원 리스트</Text>
+                    </Link>
+                    <Link
+                      to={'/employees/register'}
+                      onClick={() => setCurrentTitle(Title.RegisterEmployee)}
+                      className={
+                        currentTitle === Title.RegisterEmployee
+                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
+                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                      }
+                    >
+                      <Icon as={FaCirclePlus} />
+                      <Text ml={3}>사원 등록</Text>
                     </Link>
                   </VStack>
                 </ScaleFade>
