@@ -1,15 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import theme from "./theme";
-import "./index.css";
-import { HelmetProvider } from "react-helmet-async";
-import { RouterProvider } from "react-router-dom";
-import router from "./router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import theme from './theme';
+import './index.css';
+import { HelmetProvider } from 'react-helmet-async';
+import { RouterProvider } from 'react-router-dom';
+import router from './router';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById('root') as HTMLElement
 );
 
 const queryClient = new QueryClient();
