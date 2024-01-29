@@ -6,19 +6,19 @@ import {
   Skeleton,
   Text,
   VStack,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
+} from "@chakra-ui/react";
+import React, { useState } from "react";
 import {
   FaCirclePlus,
   FaFlipboard,
   FaListOl,
   FaTableCells,
   FaDiagramProject,
-} from 'react-icons/fa6';
-import { IoCellularSharp } from 'react-icons/io5';
-import { HiUser } from 'react-icons/hi2';
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { Link, useLocation } from 'react-router-dom';
+} from "react-icons/fa6";
+import { IoCellularSharp } from "react-icons/io5";
+import { HiUser } from "react-icons/hi2";
+import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { Link, useLocation } from "react-router-dom";
 
 enum Title {
   Dashboard,
@@ -35,17 +35,17 @@ export default function Sidebar() {
   const url = useLocation();
 
   const [currentTitle, setCurrentTitle] = useState<Title>(
-    url.pathname === '/'
+    url.pathname === "/"
       ? Title.Dashboard
-      : url.pathname === '/statistics/projects'
+      : url.pathname === "/statistics/projects"
       ? Title.StatisticsProject
-      : url.pathname === '/statistics/employee'
+      : url.pathname === "/statistics/employee"
       ? Title.StatisticsEmployee
-      : url.pathname === '/projects'
+      : url.pathname === "/projects"
       ? Title.Projects
-      : url.pathname === '/projects/register'
+      : url.pathname === "/projects/register"
       ? Title.RegisterProject
-      : url.pathname === '/employees'
+      : url.pathname === "/employees"
       ? Title.Employees
       : Title.RegisterEmployee
   );
@@ -60,39 +60,39 @@ export default function Sidebar() {
 
   return (
     <Skeleton
-      width={'16rem'}
+      width={"16rem"}
       isLoaded={true}
-      height={'100vh'}
-      position={'fixed'}
+      height={"100vh"}
+      position={"fixed"}
       top={0}
       left={0}
     >
       <Box
-        userSelect={'none'}
-        position={'fixed'}
-        top={'14'}
+        userSelect={"none"}
+        position={"fixed"}
+        top={"14"}
         left={0}
         zIndex={40}
-        w={'16rem'}
-        height={'100vh'}
+        w={"16rem"}
+        height={"100vh"}
         className="transition-transform -translate-x-full sm:translate-x-0"
       >
         <Box
-          h={'full'}
+          h={"full"}
           px={3}
           py={4}
-          overflowY={'auto'}
-          borderRightStyle={'groove'}
+          overflowY={"auto"}
+          borderRightStyle={"groove"}
           borderRightWidth={1}
         >
-          <VStack spacing={2} fontWeight={'medium'}>
+          <VStack spacing={2} fontWeight={"medium"}>
             <Link
-              to={'/'}
+              to={"/"}
               onClick={() => setCurrentTitle(Title.Dashboard)}
               className={
                 currentTitle === Title.Dashboard
-                  ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                  : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                  ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                  : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
               }
             >
               <Icon as={FaFlipboard} />
@@ -100,12 +100,12 @@ export default function Sidebar() {
             </Link>
 
             <Link
-              to={'/statistics/projects'}
+              to={"/statistics/projects"}
               onClick={() => setCurrentTitle(Title.StatisticsProject)}
               className={
                 currentTitle === Title.StatisticsProject
-                  ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                  : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                  ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                  : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
               }
             >
               <Icon as={FaTableCells} />
@@ -113,34 +113,34 @@ export default function Sidebar() {
             </Link>
 
             <Link
-              to={'/statistics/employee'}
+              to={"/statistics/employee"}
               onClick={() => setCurrentTitle(Title.StatisticsEmployee)}
               className={
                 currentTitle === Title.StatisticsEmployee
-                  ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                  : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                  ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                  : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
               }
             >
               <Icon as={IoCellularSharp} />
               <Text ml={3}>사원별 프로젝트 수행현황</Text>
             </Link>
 
-            <VStack w={'full'}>
+            <VStack w={"full"}>
               <Flex
                 onClick={() => setIsManageProjectsOpen((prev) => !prev)}
-                cursor={'pointer'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                w={'full'}
+                cursor={"pointer"}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+                w={"full"}
                 p={2}
-                fontSize={'1rem'}
-                lineHeight={'1.5rem'}
-                rounded={'lg'}
-                className=" transition duration-75 group hover:bg-gray-400"
+                fontSize={"1rem"}
+                lineHeight={"1.5rem"}
+                rounded={"lg"}
+                className=" transition duration-75 group hover:bg-teal-600 hover:text-teal-200"
               >
-                <Flex alignItems={'center'}>
+                <Flex alignItems={"center"}>
                   <Icon as={FaDiagramProject} />
-                  <Text ml={3} textAlign={'left'} whiteSpace={'nowrap'}>
+                  <Text ml={3} textAlign={"left"} whiteSpace={"nowrap"}>
                     프로젝트 관리
                   </Text>
                 </Flex>
@@ -154,24 +154,24 @@ export default function Sidebar() {
                 >
                   <VStack spacing={2} pl={6}>
                     <Link
-                      to={'/projects'}
+                      to={"/projects"}
                       onClick={() => setCurrentTitle(Title.Projects)}
                       className={
                         currentTitle === Title.Projects
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
                       }
                     >
                       <Icon as={FaListOl} />
                       <Text ml={3}>프로젝트 리스트</Text>
                     </Link>
                     <Link
-                      to={'/projects/register'}
+                      to={"/projects/register"}
                       onClick={() => setCurrentTitle(Title.RegisterProject)}
                       className={
                         currentTitle === Title.RegisterProject
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
                       }
                     >
                       <Icon as={FaCirclePlus} />
@@ -182,19 +182,19 @@ export default function Sidebar() {
               )}
               <Flex
                 onClick={() => setIsManagementEmployeesOpen((prev) => !prev)}
-                cursor={'pointer'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                w={'full'}
+                cursor={"pointer"}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+                w={"full"}
                 p={2}
-                fontSize={'1rem'}
-                lineHeight={'1.5rem'}
-                rounded={'lg'}
-                className=" transition duration-75 group hover:bg-gray-400"
+                fontSize={"1rem"}
+                lineHeight={"1.5rem"}
+                rounded={"lg"}
+                className=" transition duration-75 group hover:bg-teal-600 hover:text-teal-200"
               >
-                <Flex alignItems={'center'}>
+                <Flex alignItems={"center"}>
                   <Icon as={HiUser} />
-                  <Text ml={3} textAlign={'left'} whiteSpace={'nowrap'}>
+                  <Text ml={3} textAlign={"left"} whiteSpace={"nowrap"}>
                     사원 관리
                   </Text>
                 </Flex>
@@ -212,24 +212,24 @@ export default function Sidebar() {
                 >
                   <VStack spacing={2} pl={6}>
                     <Link
-                      to={'/employees'}
+                      to={"/employees"}
                       onClick={() => setCurrentTitle(Title.Employees)}
                       className={
                         currentTitle === Title.Employees
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
                       }
                     >
                       <Icon as={FaListOl} />
                       <Text ml={3}>사원 리스트</Text>
                     </Link>
                     <Link
-                      to={'/employees/register'}
+                      to={"/employees/register"}
                       onClick={() => setCurrentTitle(Title.RegisterEmployee)}
                       className={
                         currentTitle === Title.RegisterEmployee
-                          ? 'flex p-2 w-full items-center rounded-lg group text-blue-300 pointer-events-none'
-                          : 'flex p-2 w-full items-center rounded-lg group hover:bg-gray-400'
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
                       }
                     >
                       <Icon as={FaCirclePlus} />

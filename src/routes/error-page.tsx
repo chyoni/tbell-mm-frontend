@@ -1,7 +1,7 @@
-import { Flex, Text } from '@chakra-ui/react';
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { useRouteError } from 'react-router-dom';
+import { Flex, Text } from "@chakra-ui/react";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import { useRouteError } from "react-router-dom";
 
 export default function ErrorPage() {
   const error = useRouteError();
@@ -13,20 +13,20 @@ export default function ErrorPage() {
         <title>Error Page</title>
       </Helmet>
       <Flex
-        w={'full'}
-        height={'100vh'}
-        justifyContent={'center'}
-        alignItems={'center'}
-        flexDirection={'column'}
+        w={"full"}
+        height={"100vh"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        flexDirection={"column"}
       >
-        <Text fontSize={'xx-large'} fontWeight={600}>
+        <Text fontSize={"xx-large"} fontWeight={600}>
           Oops!
         </Text>
-        <Text mt={2} fontSize={'large'}>
+        <Text mt={2} fontSize={"large"}>
           Sorry, an unexpected error has occurred.
         </Text>
-        <Link to={'/'}>
-          <Text ml={5} color={'red'}>
+        <Link to={"/"}>
+          <Text ml={5} color={"#0ED3AC"}>
             Go home &rarr;
           </Text>
         </Link>
