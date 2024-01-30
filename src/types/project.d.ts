@@ -18,9 +18,9 @@ export interface IProject {
   projectStatus: 'YEAR' | 'SINGLE';
   operationRate: 'INCLUDE' | 'EXCEPT';
   departmentName: string;
-  unitPrices: [
-    {
-      [key: number];
-    }
-  ];
+  unitPrices: IUnitPrice[];
+}
+
+export interface IUnitPrice {
+  [key: string]: number;
 }

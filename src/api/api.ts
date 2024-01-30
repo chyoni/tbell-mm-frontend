@@ -28,3 +28,6 @@ export const getProject = async (
   contractNumber: string | undefined
 ): Promise<IGetProject> =>
   instance.get(`projects/${contractNumber}`).then((res) => res.data);
+
+export const getDepartments = async () =>
+  instance.get('departments').then((res) => res.data);
