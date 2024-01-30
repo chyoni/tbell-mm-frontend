@@ -94,6 +94,12 @@ export default function Edit() {
     setUnitPrices(removedUnitPrices);
   };
 
+  const keyUpPrice = (
+    e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter') onAddUnitPrice();
+  };
+
   const onAddUnitPrice = () => {
     if (
       selectedLevel === undefined ||
@@ -127,6 +133,7 @@ export default function Edit() {
     }
 
     setUnitPrices(copiedUnitPrices);
+    setSelectedUnitPrice('');
   };
 
   useEffect(() => {
@@ -323,6 +330,7 @@ export default function Edit() {
                       <FormControl>
                         <FormLabel>단가</FormLabel>
                         <NumericFormat
+                          onKeyUp={keyUpPrice}
                           value={selectedUnitPrice}
                           thousandSeparator={','}
                           className="p-2 rounded-md border-2 border-inherit bg-inherit w-full 
