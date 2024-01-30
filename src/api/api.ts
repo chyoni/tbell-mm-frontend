@@ -1,5 +1,4 @@
-import { IGetProjects } from './../types/project.d';
-import { QueryFunctionContext } from '@tanstack/react-query';
+import { IGetProject, IGetProjects } from './../types/project.d';
 import axios from 'axios';
 
 const instance = axios.create({
@@ -7,10 +6,12 @@ const instance = axios.create({
   withCredentials: false,
 });
 
-/* export const getProjects = async ({
-  queryKey,
-}: QueryFunctionContext): Promise<IGetProjects> => {
-  const [, page, size, year, teamName] = queryKey;
+export const getProjects = async (
+  page: number,
+  size: number,
+  year?: string,
+  teamName?: string
+): Promise<IGetProjects> => {
   return instance
     .get('projects', {
       params: {
@@ -21,20 +22,9 @@ const instance = axios.create({
       },
     })
     .then((res) => res.data);
-}; */
-
-export const getProjects = async (
-  page: number,
-  size: number
-): Promise<IGetProjects> => {
-  return instance
-    .get('projects', {
-      params: {
-        page,
-        /* size,
-        ...(year !== undefined && year !== '' && { year }),
-        ...(teamName !== undefined && teamName !== '' && { teamName }), */
-      },
-    })
-    .then((res) => res.data);
 };
+
+export const getProject = async (
+  contractNumber: string | undefined
+): Promise<IGetProject> =>
+  instance.get(`projects/${contractNumber}`).then((res) => res.data);
