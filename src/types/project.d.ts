@@ -25,7 +25,8 @@ export interface IUnitPrice {
   [key: string]: number;
 }
 
-export interface IEditOrCreateProjectResponse extends IResponse {
+// CUD : Create Update Delete
+export interface ICUDProjectResponse extends IResponse {
   data: IProject;
 }
 

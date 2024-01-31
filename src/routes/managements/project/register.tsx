@@ -31,7 +31,7 @@ import { getDepartments } from "../../../api/departments";
 import { IResponse, Option } from "../../../types/common";
 import {
   ICreateProjectPayload,
-  IEditOrCreateProjectResponse,
+  ICUDProjectResponse,
   IUnitPrice,
 } from "../../../types/project";
 import { createProject } from "../../../api/projects";
@@ -167,7 +167,7 @@ export default function ProjectRegister() {
   };
 
   const registerMutation = useMutation<
-    IEditOrCreateProjectResponse,
+    ICUDProjectResponse,
     IResponse,
     ICreateProjectPayload
   >({

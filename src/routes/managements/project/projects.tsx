@@ -4,6 +4,13 @@ import {
   Center,
   HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Skeleton,
   Table,
   TableCaption,
@@ -14,17 +21,23 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
-import { getProjects } from "../../../api/projects";
-import { IGetProjects } from "../../../types/project";
+import { Link, useNavigate } from "react-router-dom";
+import { deleteProject, getProjects } from "../../../api/projects";
+import { ICUDProjectResponse, IGetProjects } from "../../../types/project";
 import { primaryColor } from "../../../theme";
 import Pagination from "../../../components/pagination";
+import { IResponse } from "../../../types/common";
 
 export default function Projects() {
+  const toast = useToast();
+  const navigate = useNavigate();
+
   const [page, setPage] = useState<number>(0);
   const [year, setYear] = useState<string | undefined>("");
   const [teamName, setTeamName] = useState<string | undefined>("");
@@ -55,6 +68,47 @@ export default function Projects() {
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
     if (e.key === "Enter") searchByCond();
+  };
+
+  const {
+    onToggle: onDeleteToggle,
+    isOpen: isDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+
+  const [deleteContractNumber, setDeleteContractNumber] = useState<string>("");
+
+  const deleteMutation = useMutation<ICUDProjectResponse, IResponse>({
+    mutationFn: () => deleteProject(deleteContractNumber),
+    onSuccess: () => {
+      toast({
+        title: `삭제 완료`,
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+
+      setTimeout(() => {
+        navigate("/projects");
+      }, 1500);
+    },
+
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `삭제 실패`,
+        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const onDeleteProject = () => {
+    if (deleteContractNumber === "" || deleteContractNumber === undefined)
+      return;
+    deleteMutation.mutate();
   };
 
   return (
@@ -169,6 +223,44 @@ export default function Projects() {
                         <Button size={"xs"} colorScheme="teal">
                           <Link to={`edit/${p.contractNumber}`}>수정</Link>
                         </Button>
+                        <Button
+                          size={"xs"}
+                          colorScheme="teal"
+                          onClick={() => {
+                            onDeleteToggle();
+                            setDeleteContractNumber(p.contractNumber);
+                          }}
+                        >
+                          삭제
+                        </Button>
+                        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalHeader>프로젝트 삭제</ModalHeader>
+                            <ModalCloseButton />
+                            <ModalBody>
+                              이 작업은 되돌릴 수 없습니다. 정말로 삭제
+                              하시겠습니까?
+                            </ModalBody>
+                            <ModalFooter>
+                              <Button
+                                variant={"outline"}
+                                mr={3}
+                                onClick={onDeleteClose}
+                              >
+                                취소
+                              </Button>
+                              <Button
+                                colorScheme="red"
+                                onClick={onDeleteProject}
+                                isDisabled={deleteMutation.isPending}
+                                isLoading={deleteMutation.isPending}
+                              >
+                                삭제
+                              </Button>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
                       </HStack>
                     </Td>
                   </Tr>

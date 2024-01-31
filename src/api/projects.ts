@@ -1,5 +1,5 @@
 import {
-  IEditOrCreateProjectResponse,
+  ICUDProjectResponse,
   IGetProject,
   IGetProjects,
   IUnitPrice,
@@ -39,7 +39,7 @@ export const editProject = async (
   operationRate?: "INCLUDE" | "EXCEPT",
   departmentName?: string,
   unitPrices?: IUnitPrice[]
-): Promise<IEditOrCreateProjectResponse> =>
+): Promise<ICUDProjectResponse> =>
   instance
     .put(
       `projects/${contractNumber}`,
@@ -68,7 +68,7 @@ export const createProject = async (
   operationRate: "INCLUDE" | "EXCEPT",
   departmentName: string,
   unitPrices: IUnitPrice[]
-): Promise<IEditOrCreateProjectResponse> =>
+): Promise<ICUDProjectResponse> =>
   instance
     .post(
       `projects`,
@@ -86,3 +86,8 @@ export const createProject = async (
       { headers: { "Content-Type": "application/json" } }
     )
     .then((res) => res.data);
+
+export const deleteProject = async (
+  contractNumber: string
+): Promise<ICUDProjectResponse> =>
+  instance.delete(`projects/${contractNumber}`).then((res) => res.data);

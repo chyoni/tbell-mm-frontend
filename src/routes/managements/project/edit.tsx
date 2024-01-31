@@ -24,7 +24,7 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   IEditProjectPayload,
-  IEditOrCreateProjectResponse,
+  ICUDProjectResponse,
   IGetProject,
   IUnitPrice,
 } from "../../../types/project";
@@ -144,7 +144,7 @@ export default function ProjectEdit() {
   };
 
   const editMutation = useMutation<
-    IEditOrCreateProjectResponse,
+    ICUDProjectResponse,
     IResponse,
     IEditProjectPayload
   >({

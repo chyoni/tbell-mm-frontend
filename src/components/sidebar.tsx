@@ -14,6 +14,7 @@ import {
   FaListOl,
   FaTableCells,
   FaDiagramProject,
+  FaDiagramNext,
 } from "react-icons/fa6";
 import { IoCellularSharp } from "react-icons/io5";
 import { HiUser } from "react-icons/hi2";
@@ -24,6 +25,8 @@ enum Title {
   Dashboard,
   StatisticsProject,
   StatisticsEmployee,
+  Departments,
+  RegisterDepartment,
   Projects,
   RegisterProject,
   Employees,
@@ -46,12 +49,22 @@ export default function Sidebar() {
       ? Title.Projects
       : url.pathname === "/projects/register"
       ? Title.RegisterProject
+      : url.pathname === "/departments"
+      ? Title.Departments
+      : url.pathname === "/departments/register"
+      ? Title.RegisterDepartment
       : url.pathname === "/employees"
       ? Title.Employees
       : url.pathname === "/employees/register"
       ? Title.RegisterEmployee
       : Title.NoTitle
   );
+
+  const [isManageDepartmentOpen, setIsManageDepartmentOpen] = useState<boolean>(
+    currentTitle === Title.Departments ||
+      currentTitle === Title.RegisterDepartment
+  );
+
   const [isManageProjectsOpen, setIsManageProjectsOpen] = useState<boolean>(
     currentTitle === Title.Projects || currentTitle === Title.RegisterProject
   );
@@ -73,6 +86,10 @@ export default function Sidebar() {
         ? Title.Projects
         : url.pathname === "/projects/register"
         ? Title.RegisterProject
+        : url.pathname === "/departments"
+        ? Title.Departments
+        : url.pathname === "/departments/register"
+        ? Title.RegisterDepartment
         : url.pathname === "/employees"
         ? Title.Employees
         : url.pathname === "/employees/register"
@@ -150,6 +167,65 @@ export default function Sidebar() {
 
             <VStack w={"full"}>
               <Flex
+                onClick={() => setIsManageDepartmentOpen((prev) => !prev)}
+                cursor={"pointer"}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+                w={"full"}
+                p={2}
+                fontSize={"1rem"}
+                lineHeight={"1.5rem"}
+                rounded={"lg"}
+                className=" transition duration-75 group hover:bg-teal-600 hover:text-teal-200"
+              >
+                <Flex alignItems={"center"}>
+                  <Icon as={FaDiagramNext} />
+                  <Text ml={3} textAlign={"left"} whiteSpace={"nowrap"}>
+                    부서 관리
+                  </Text>
+                </Flex>
+                {isManageDepartmentOpen ? (
+                  <ChevronUpIcon />
+                ) : (
+                  <ChevronDownIcon />
+                )}
+              </Flex>
+              {isManageDepartmentOpen && (
+                <ScaleFade
+                  in={isManageDepartmentOpen}
+                  initialScale={0.9}
+                  className="w-full"
+                >
+                  <VStack spacing={2} pl={6}>
+                    <Link
+                      to={"/departments"}
+                      onClick={() => setCurrentTitle(Title.Departments)}
+                      className={
+                        currentTitle === Title.Departments
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
+                      }
+                    >
+                      <Icon as={FaListOl} />
+                      <Text ml={3}>부서 리스트</Text>
+                    </Link>
+                    <Link
+                      to={"/departments/register"}
+                      onClick={() => setCurrentTitle(Title.RegisterDepartment)}
+                      className={
+                        currentTitle === Title.RegisterDepartment
+                          ? "flex p-2 w-full items-center rounded-lg group text-teal-500 pointer-events-none"
+                          : "flex p-2 w-full items-center rounded-lg group hover:bg-teal-600 hover:text-teal-200"
+                      }
+                    >
+                      <Icon as={FaCirclePlus} />
+                      <Text ml={3}>부서 등록</Text>
+                    </Link>
+                  </VStack>
+                </ScaleFade>
+              )}
+
+              <Flex
                 onClick={() => setIsManageProjectsOpen((prev) => !prev)}
                 cursor={"pointer"}
                 alignItems={"center"}
@@ -203,6 +279,7 @@ export default function Sidebar() {
                   </VStack>
                 </ScaleFade>
               )}
+
               <Flex
                 onClick={() => setIsManagementEmployeesOpen((prev) => !prev)}
                 cursor={"pointer"}
