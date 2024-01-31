@@ -9,6 +9,7 @@ import ProjectRegister from "./routes/managements/project/register";
 import Departments from "./routes/managements/department/departments";
 import DepartmentEdit from "./routes/managements/department/edit";
 import DepartmentRegister from "./routes/managements/department/register";
+import Employees from "./routes/managements/employee/employees";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/projects/details/:contractNumber",
         element: <ProjectDetails />,
+      },
+      {
+        path: "/employees",
+        element: <Employees />,
       },
     ],
   },

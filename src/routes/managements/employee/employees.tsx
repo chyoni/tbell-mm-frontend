@@ -1,9 +1,10 @@
 import {
-  Box,
-  Button,
-  Center,
   HStack,
   Input,
+  Button,
+  Box,
+  Text,
+  Center,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,39 +18,22 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
-import { deleteProject, getProjects } from "../../../api/projects";
-import { ICUDProjectResponse, IGetProjects } from "../../../types/project";
 import { primaryColor } from "../../../theme";
 import Pagination from "../../../components/pagination";
-import { IResponse } from "../../../types/common";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { IGetEmployees } from "../../../types/employee";
+import { getEmployees } from "../../../api/employees";
+import { Link } from "react-router-dom";
 
-export default function Projects() {
-  const toast = useToast();
-  const navigate = useNavigate();
-
+export default function Employees() {
   const [page, setPage] = useState<number>(0);
-  const [year, setYear] = useState<string | undefined>("");
-  const [teamName, setTeamName] = useState<string | undefined>("");
-
-  // year 또는 teamName을 state로 관리하고 있을 때 그 값이 변경될 때 즉시(onChangeEvent) 이 쿼리를 다시 패치하고 싶으면 queryKey의 배열안에 year랑 teamName을 넣으면 된다.
-  // 그럼 state가 변하면 당연히 변한 상태에 따라 쿼리를 다시 실행하게 되는것은 합리적이다. 근데 만약, 상태로 관리하지만 내가 딱 입력을 다하고 특정 시점에 이 쿼리를 다시 패치 하고 싶다면 (clickEvent)
-  // queryKey는 그 state를 넣지말고 실행하는 API Function에만 아래처럼 파라미터로 던진다음에 click event에 refetch를 실행해주면 된다.
-  const { isLoading, data, refetch } = useQuery<IGetProjects, Error>({
-    queryKey: ["projects"],
-    queryFn: () => getProjects(page, 10, year, teamName),
-  });
-
   // 첫번째 페이지 Function
   const goToFirstPage = () => setPage(0);
   // 이전 페이지 Function
@@ -60,92 +44,55 @@ export default function Projects() {
   const goToLastPage = (lastPage: number) => setPage(lastPage);
   // 특정 페이지 지정 Function
   const goToSpecificPage = (page: number) => setPage(page);
-
-  const searchByCond = async () => await refetch();
-
+  const [searchName, setSearchName] = useState<string>("");
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === "Enter") searchByCond();
+    if (e.key === "Enter") {
+      searchByCond();
+    }
   };
+  const searchByCond = () => {};
+
+  const { isLoading, data } = useQuery<IGetEmployees, Error>({
+    queryKey: ["employees"],
+    queryFn: () => getEmployees(page, 10, searchName),
+  });
 
   const {
     onToggle: onDeleteToggle,
     isOpen: isDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
-
-  const [deleteContractNumber, setDeleteContractNumber] = useState<string>("");
-
-  const deleteMutation = useMutation<ICUDProjectResponse, IResponse>({
-    mutationFn: () => deleteProject(deleteContractNumber),
-    onSuccess: () => {
-      toast({
-        title: `삭제 완료`,
-        status: "success",
-        duration: 1500,
-        isClosable: true,
-      });
-
-      setTimeout(() => {
-        navigate("/projects");
-      }, 1500);
-    },
-
-    onError: (error) => {
-      console.log(error);
-      toast({
-        title: `삭제 실패`,
-        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
-
-  const onDeleteProject = () => {
-    if (deleteContractNumber === "" || deleteContractNumber === undefined)
+  const [deleteEmployeeNumber, setDeleteEmployeeNumber] = useState<string>("");
+  const onDeleteEmployee = () => {
+    if (deleteEmployeeNumber === "" || deleteEmployeeNumber === undefined)
       return;
     deleteMutation.mutate();
   };
 
+  const deleteMutation = useMutation();
   return (
     <>
       <Helmet>
-        <title>프로젝트 리스트</title>
+        <title>사원 리스트</title>
       </Helmet>
       <Box marginBottom={5}>
         <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          프로젝트 리스트
+          사원 리스트
         </Text>
       </Box>
       <HStack marginBottom={5} spacing={8}>
-        <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={1} fontWeight={"hairline"} width={120}>
-            연도 (시작일 기준)
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={20}>
+            사원명
           </Text>
           <Input
-            onChange={(event) => setYear(event.target.value)}
-            placeholder="YYYY"
+            onChange={(event) => setSearchName(event.target.value)}
+            placeholder="최치원"
             size="sm"
             type="text"
-            value={year}
-            width={110}
-            focusBorderColor={primaryColor}
-            onKeyUp={handleKeyUp}
-          />
-        </Box>
-        <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={1} fontWeight={"hairline"} width={30}>
-            팀명
-          </Text>
-          <Input
-            onChange={(event) => setTeamName(event.target.value)}
-            placeholder="SK텔레콤 1팀"
-            size="sm"
-            type="text"
-            value={teamName}
+            value={searchName}
             width={200}
             focusBorderColor={primaryColor}
             onKeyUp={handleKeyUp}
@@ -192,42 +139,31 @@ export default function Projects() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th>계약번호</Th>
-                  <Th>소속</Th>
-                  <Th>팀명</Th>
-                  <Th>상태</Th>
-                  <Th>시작일</Th>
-                  <Th>종료일</Th>
-                  <Th>원청</Th>
+                  <Th>사번</Th>
+                  <Th>이름</Th>
+                  <Th>입사일</Th>
+                  <Th>퇴사일</Th>
                   <Th>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.data.content.map((p, index) => (
+                {data?.data.content.map((emp, index) => (
                   <Tr key={index}>
-                    <Td>{p.contractNumber}</Td>
-                    <Td>{p.departmentName}</Td>
-                    <Td>{p.teamName}</Td>
-                    <Td>{p.projectStatus === "YEAR" ? "연간" : "단건"}</Td>
-                    <Td>{p.startDate}</Td>
-                    <Td>{p.endDate}</Td>
-                    <Td>{p.contractor}</Td>
+                    <Td>{emp.employeeNumber}</Td>
+                    <Td>{emp.name}</Td>
+                    <Td>{emp.startDate}</Td>
+                    <Td>{emp.resignationDate ? emp.resignationDate : "-"}</Td>
                     <Td>
                       <HStack spacing={2}>
                         <Button size={"xs"} colorScheme="teal">
-                          <Link to={`details/${p.contractNumber}`}>
-                            세부 정보
-                          </Link>
-                        </Button>
-                        <Button size={"xs"} colorScheme="teal">
-                          <Link to={`edit/${p.contractNumber}`}>수정</Link>
+                          <Link to={`edit/${emp.employeeNumber}`}>수정</Link>
                         </Button>
                         <Button
                           size={"xs"}
                           colorScheme="red"
                           onClick={() => {
                             onDeleteToggle();
-                            setDeleteContractNumber(p.contractNumber);
+                            setDeleteEmployeeNumber(emp.employeeNumber);
                           }}
                         >
                           삭제
@@ -235,7 +171,7 @@ export default function Projects() {
                         <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
                           <ModalOverlay />
                           <ModalContent>
-                            <ModalHeader>프로젝트 삭제</ModalHeader>
+                            <ModalHeader>사원 삭제</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
                               이 작업은 되돌릴 수 없습니다. 정말로 삭제
@@ -251,7 +187,7 @@ export default function Projects() {
                               </Button>
                               <Button
                                 colorScheme="red"
-                                onClick={onDeleteProject}
+                                onClick={onDeleteEmployee}
                                 isDisabled={deleteMutation.isPending}
                                 isLoading={deleteMutation.isPending}
                               >
