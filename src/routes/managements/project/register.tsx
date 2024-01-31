@@ -218,7 +218,7 @@ export default function ProjectRegister() {
   return (
     <>
       <Helmet>
-        <title>{`프로젝트 생성`}</title>
+        <title>{`프로젝트 등록`}</title>
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={"semibold"} fontSize={"2xl"}>

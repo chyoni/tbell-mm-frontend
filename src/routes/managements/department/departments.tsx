@@ -30,10 +30,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Pagination from "../../../components/pagination";
 import { primaryColor } from "../../../theme";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  IDeleteDepartmentRes,
-  IGetDepartments,
-} from "../../../types/department";
+import { ICRUDDepartmentRes, IGetDepartments } from "../../../types/department";
 import { deleteDepartment, getDepartments } from "../../../api/departments";
 import { IResponse } from "../../../types/common";
 
@@ -81,7 +78,7 @@ export default function Departments() {
     deleteMutation.mutate();
   };
 
-  const deleteMutation = useMutation<IDeleteDepartmentRes, IResponse>({
+  const deleteMutation = useMutation<ICRUDDepartmentRes, IResponse>({
     mutationFn: () => deleteDepartment(deleteDepartmentName),
     onSuccess: () => {
       toast({
@@ -174,20 +171,18 @@ export default function Departments() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th w={"44%"}>#</Th>
-                  <Th w={"44%"}>부서명</Th>
-                  <Th w={"12%"}>작업</Th>
+                  <Th w={"90%"}>부서명</Th>
+                  <Th w={"10%"}>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {data?.data.content.map((p, index) => (
                   <Tr key={index}>
-                    <Td>{index + 1}</Td>
                     <Td>{p.name}</Td>
                     <Td>
                       <HStack spacing={2}>
                         <Button size={"xs"} colorScheme="teal">
-                          <Link to={`edit/${p.contractNumber}`}>수정</Link>
+                          <Link to={`edit/${p.name}`}>수정</Link>
                         </Button>
                         <Button
                           size={"xs"}

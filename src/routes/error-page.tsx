@@ -24,7 +24,7 @@ export default function ErrorPage() {
           😢 잘못된 경로입니다.
         </Text>
         <Text mt={2} fontSize={"large"}>
-          뭔가 잘못된 경로로 들어온 것 같습니다.
+          올바르지 않은 경로를 통해 들어온 것 같습니다.
         </Text>
         <Link to={"/"}>
           <Text ml={5} color={primaryColor}>

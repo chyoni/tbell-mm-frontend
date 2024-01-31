@@ -7,6 +7,8 @@ import ProjectEdit from "./routes/managements/project/edit";
 import ProjectDetails from "./routes/managements/project/details";
 import ProjectRegister from "./routes/managements/project/register";
 import Departments from "./routes/managements/department/departments";
+import DepartmentEdit from "./routes/managements/department/edit";
+import DepartmentRegister from "./routes/managements/department/register";
 
 const router = createBrowserRouter([
   {
@@ -19,16 +21,24 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/departments",
+        element: <Departments />,
+      },
+      {
+        path: "/departments/register",
+        element: <DepartmentRegister />,
+      },
+      {
+        path: "/departments/edit/:departmentName",
+        element: <DepartmentEdit />,
+      },
+      {
         path: "/projects",
         element: <Projects />,
       },
       {
         path: "/projects/register",
         element: <ProjectRegister />,
-      },
-      {
-        path: "/departments",
-        element: <Departments />,
       },
       {
         path: "/projects/edit/:contractNumber",

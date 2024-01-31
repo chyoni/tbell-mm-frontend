@@ -9,6 +9,6 @@ export interface IDepartment {
   [name: string]: string;
 }
 
-export interface IDeleteDepartmentRes extends IResponse {
+export interface ICRUDDepartmentRes extends IResponse {
   data: IDepartment;
 }
