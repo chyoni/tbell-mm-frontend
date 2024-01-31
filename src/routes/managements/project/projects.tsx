@@ -225,7 +225,7 @@ export default function Projects() {
                         </Button>
                         <Button
                           size={"xs"}
-                          colorScheme="teal"
+                          colorScheme="red"
                           onClick={() => {
                             onDeleteToggle();
                             setDeleteContractNumber(p.contractNumber);

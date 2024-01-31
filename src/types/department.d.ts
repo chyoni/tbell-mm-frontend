@@ -1,10 +1,14 @@
-import { IResponse } from './common';
-import { IGetData } from './pagable';
+import { IResponse } from "./common";
+import { IGetData } from "./pagable";
 
 export interface IGetDepartments extends IResponse {
   data: IGetData<IDepartment>;
 }
 
 export interface IDepartment {
-  [name: string];
+  [name: string]: string;
+}
+
+export interface IDeleteDepartmentRes extends IResponse {
+  data: IDepartment;
 }

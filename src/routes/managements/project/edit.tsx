@@ -229,7 +229,7 @@ export default function ProjectEdit() {
   return (
     <>
       <Helmet>
-        <title>{`프로젝트 - ${contractNumber}`}</title>
+        <title>{`프로젝트 수정 - ${contractNumber}`}</title>
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={"semibold"} fontSize={"2xl"}>
@@ -265,7 +265,7 @@ export default function ProjectEdit() {
       <Skeleton
         isLoaded={!isLoading && !departmentsLoading}
         height={"50%"}
-        fadeDuration={3}
+        fadeDuration={1.6}
       >
         {data && data.ok && departments && departments.ok && (
           <HStack marginTop={10}>
@@ -513,7 +513,11 @@ export default function ProjectEdit() {
                               borderColor={primaryColor}
                               p={2}
                             >
-                              <Flex justifyContent={"flex-end"}>
+                              <Flex
+                                justifyContent={"space-between"}
+                                alignItems={"center"}
+                              >
+                                <Text>{convertLevelEnToKo(keyValue[0])}</Text>
                                 <IconButton
                                   onClick={() =>
                                     clickRemoveUnitPrice(keyValue[0])
@@ -527,7 +531,6 @@ export default function ProjectEdit() {
                                 />
                               </Flex>
                               <Box>
-                                <Text>{convertLevelEnToKo(keyValue[0])}</Text>
                                 <NumericFormat
                                   value={keyValue[1]}
                                   displayType="text"

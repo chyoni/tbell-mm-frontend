@@ -21,14 +21,14 @@ export default function ErrorPage() {
         flexDirection={"column"}
       >
         <Text fontSize={"xx-large"} fontWeight={600}>
-          Oops!
+          😢 잘못된 경로입니다.
         </Text>
         <Text mt={2} fontSize={"large"}>
-          Sorry, an unexpected error has occurred.
+          뭔가 잘못된 경로로 들어온 것 같습니다.
         </Text>
         <Link to={"/"}>
           <Text ml={5} color={primaryColor}>
-            Go home &rarr;
+            메인화면으로 돌아가기 &rarr;
           </Text>
         </Link>
       </Flex>

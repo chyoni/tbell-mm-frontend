@@ -77,7 +77,7 @@ export default function ProjectRegister() {
   const handleTeamName = (e: ChangeEvent<HTMLInputElement>) =>
     setTeamName(e.target.value);
 
-  const [department, setDepartment] = useState<string>("");
+  const [department, setDepartment] = useState<string>("STE 1실");
   const handleDepartments = (e: ChangeEvent<HTMLSelectElement>) =>
     setDepartment(e.target.value);
 
@@ -252,7 +252,11 @@ export default function ProjectRegister() {
           등록
         </Button>
       </HStack>
-      <Skeleton isLoaded={!departmentsLoading} height={"50%"} fadeDuration={3}>
+      <Skeleton
+        isLoaded={!departmentsLoading}
+        height={"50%"}
+        fadeDuration={1.6}
+      >
         {departments && departments.ok && (
           <HStack marginTop={10}>
             <Flex w={"100%"}>

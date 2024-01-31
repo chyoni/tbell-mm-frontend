@@ -56,7 +56,7 @@ export default function ProjectDetails() {
         </Button>
       </HStack>
       {
-        <Skeleton isLoaded={!isLoading} height={"50%"} fadeDuration={3}>
+        <Skeleton isLoaded={!isLoading} height={"50%"} fadeDuration={1.6}>
           {data && data.ok && (
             <HStack marginTop={10}>
               <Flex w={"100%"}>
