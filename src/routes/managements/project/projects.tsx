@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { getProjects } from "../../../api/api";
+import { getProjects } from "../../../api/projects";
 import { IGetProjects } from "../../../types/project";
 import { primaryColor } from "../../../theme";
 import Pagination from "../../../components/pagination";
@@ -162,7 +162,7 @@ export default function Projects() {
                     <Td>
                       <HStack spacing={2}>
                         <Button size={"xs"} colorScheme="teal">
-                          <Link to={`/details/${p.contractNumber}`}>
+                          <Link to={`details/${p.contractNumber}`}>
                             세부 정보
                           </Link>
                         </Button>
