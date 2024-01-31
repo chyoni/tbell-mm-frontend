@@ -40,7 +40,12 @@ export default function ProjectDetails() {
       <Helmet>
         <title>{`프로젝트 - ${contractNumber}`}</title>
       </Helmet>
-      <HStack py={2} justifyContent={"space-between"}>
+      <Box marginBottom={1}>
+        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+          프로젝트 정보
+        </Text>
+      </Box>
+      <HStack justifyContent={"space-between"}>
         <Button
           variant={"ghost"}
           size={"sm"}

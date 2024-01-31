@@ -3,8 +3,9 @@ import Root from "./components/root";
 import ErrorPage from "./routes/error-page";
 import Home from "./routes/home/home";
 import Projects from "./routes/managements/project/projects";
-import Edit from "./routes/managements/project/edit";
+import ProjectEdit from "./routes/managements/project/edit";
 import ProjectDetails from "./routes/managements/project/details";
+import ProjectRegister from "./routes/managements/project/register";
 
 const router = createBrowserRouter([
   {
@@ -21,8 +22,12 @@ const router = createBrowserRouter([
         element: <Projects />,
       },
       {
+        path: "/projects/register",
+        element: <ProjectRegister />,
+      },
+      {
         path: "/projects/edit/:contractNumber",
-        element: <Edit />,
+        element: <ProjectEdit />,
       },
       {
         path: "/projects/details/:contractNumber",

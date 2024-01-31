@@ -25,7 +25,7 @@ export interface IUnitPrice {
   [key: string]: number;
 }
 
-export interface IEditProjectResponse extends IResponse {
+export interface IEditOrCreateProjectResponse extends IResponse {
   data: IProject;
 }
 
@@ -39,4 +39,16 @@ export interface IEditProjectPayload {
   operationRate?: "INCLUDE" | "EXCEPT";
   departmentName?: string;
   unitPrices?: IUnitPrice[];
+}
+
+export interface ICreateProjectPayload {
+  contractNumber: string;
+  teamName: string;
+  contractor: string;
+  startDate: string;
+  endDate: string;
+  projectStatus: "YEAR" | "SINGLE";
+  operationRate: "INCLUDE" | "EXCEPT";
+  departmentName: string;
+  unitPrices: IUnitPrice[];
 }

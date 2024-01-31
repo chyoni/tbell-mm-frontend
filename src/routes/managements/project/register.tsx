@@ -1,52 +1,44 @@
 import {
+  HStack,
   Box,
+  Text,
   Button,
+  Skeleton,
   Flex,
+  VStack,
   FormControl,
   FormLabel,
-  HStack,
   Input,
-  Radio,
+  FormErrorMessage,
   RadioGroup,
+  Radio,
   Select as ChakraSelect,
-  Skeleton,
-  VStack,
   Grid,
-  Text,
   IconButton,
   useToast,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { NumericFormat } from "react-number-format";
 import Select, { ActionMeta, SingleValue } from "react-select";
-import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
+import { IoCloseCircleSharp } from "react-icons/io5";
+import { primaryColor } from "../../../theme";
+import { unitPriceLv, convertLevelEnToKo } from "../../../utils";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { IGetDepartments } from "../../../types/department";
+import { getDepartments } from "../../../api/departments";
+import { IResponse, Option } from "../../../types/common";
 import {
-  IEditProjectPayload,
+  ICreateProjectPayload,
   IEditOrCreateProjectResponse,
-  IGetProject,
   IUnitPrice,
 } from "../../../types/project";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { primaryColor } from "../../../theme";
-import { IGetDepartments } from "../../../types/department";
-import { convertLevelEnToKo, unitPriceLv } from "../../../utils";
-import { IResponse, Option } from "../../../types/common";
-import { IoCloseCircleSharp } from "react-icons/io5";
-import { getDepartments } from "../../../api/departments";
-import { editProject, getProject } from "../../../api/projects";
+import { createProject } from "../../../api/projects";
 
-export default function ProjectEdit() {
+export default function ProjectRegister() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { contractNumber } = useParams();
-
-  const { isLoading, data } = useQuery<IGetProject, Error>({
-    queryKey: ["project", contractNumber],
-    queryFn: () => getProject(contractNumber!),
-    enabled: contractNumber !== undefined,
-  });
 
   const { isLoading: departmentsLoading, data: departments } = useQuery<
     IGetDepartments,
@@ -56,30 +48,36 @@ export default function ProjectEdit() {
     queryFn: () => getDepartments(),
   });
 
-  const [pStatus, setPStatus] = useState<"YEAR" | "SINGLE">();
+  const [pStatus, setPStatus] = useState<"YEAR" | "SINGLE">("YEAR");
   const handleProjectStatus = (value: "YEAR" | "SINGLE") => setPStatus(value);
 
-  const [operationRate, setOperationRate] = useState<"INCLUDE" | "EXCEPT">();
+  const [operationRate, setOperationRate] = useState<"INCLUDE" | "EXCEPT">(
+    "INCLUDE"
+  );
   const handleOperationRate = (value: "INCLUDE" | "EXCEPT") =>
     setOperationRate(value);
 
-  const [startDate, setStartDate] = useState<string>();
+  const [startDate, setStartDate] = useState<string>("");
   const handleStartDate = (event: ChangeEvent<HTMLInputElement>) =>
     setStartDate(event.target.value);
 
-  const [endDate, setEndDate] = useState<string>();
+  const [endDate, setEndDate] = useState<string>("");
   const handleEndDate = (event: ChangeEvent<HTMLInputElement>) =>
     setEndDate(event.target.value);
 
-  const [contractor, setContractor] = useState<string>();
+  const [contractNumber, setContractNumber] = useState<string>("");
+  const handleContractNumber = (e: ChangeEvent<HTMLInputElement>) =>
+    setContractNumber(e.target.value);
+
+  const [contractor, setContractor] = useState<string>("");
   const handleContractor = (e: ChangeEvent<HTMLInputElement>) =>
     setContractor(e.target.value);
 
-  const [teamName, setTeamName] = useState<string>();
+  const [teamName, setTeamName] = useState<string>("");
   const handleTeamName = (e: ChangeEvent<HTMLInputElement>) =>
     setTeamName(e.target.value);
 
-  const [department, setDepartment] = useState<string>();
+  const [department, setDepartment] = useState<string>("");
   const handleDepartments = (e: ChangeEvent<HTMLSelectElement>) =>
     setDepartment(e.target.value);
 
@@ -89,7 +87,7 @@ export default function ProjectEdit() {
     actionMeta: ActionMeta<Option>
   ) => setSelectedLevel(newValue);
 
-  const [selectedUnitPrice, setSelectedUnitPrice] = useState<string>();
+  const [selectedUnitPrice, setSelectedUnitPrice] = useState<string>("");
   const onSelectedUnitPriceChange = (e: ChangeEvent<HTMLInputElement>) =>
     setSelectedUnitPrice(e.target.value);
 
@@ -143,14 +141,39 @@ export default function ProjectEdit() {
     setSelectedUnitPrice("");
   };
 
-  const editMutation = useMutation<
+  const onRegister = () => {
+    if (
+      isContractNumberError ||
+      isContractorError ||
+      isDepartmentError ||
+      isTeamNameError ||
+      isStartDateError ||
+      isEndDateError ||
+      isConfiguredUnitPriceError
+    )
+      return;
+
+    registerMutation.mutate({
+      contractNumber,
+      teamName,
+      contractor,
+      startDate,
+      endDate,
+      projectStatus: pStatus,
+      operationRate,
+      departmentName: department,
+      unitPrices,
+    });
+  };
+
+  const registerMutation = useMutation<
     IEditOrCreateProjectResponse,
     IResponse,
-    IEditProjectPayload
+    ICreateProjectPayload
   >({
     mutationFn: () =>
-      editProject(
-        contractNumber!,
+      createProject(
+        contractNumber,
         teamName,
         contractor,
         startDate,
@@ -162,11 +185,14 @@ export default function ProjectEdit() {
       ),
     onSuccess(data, variables, context) {
       toast({
-        title: `수정 완료`,
+        title: `등록 완료`,
         status: "success",
         duration: 1500,
         isClosable: true,
       });
+      setTimeout(() => {
+        navigate("/projects");
+      }, 1500);
     },
     onError: (error) => {
       console.log(error);
@@ -180,45 +206,8 @@ export default function ProjectEdit() {
     },
   });
 
-  const onEdit = () => {
-    if (contractNumber === undefined || contractNumber === "") return;
-
-    if (
-      isContractorError ||
-      isDepartmentError ||
-      isTeamNameError ||
-      isStartDateError ||
-      isEndDateError ||
-      isConfiguredUnitPriceError
-    )
-      return;
-
-    editMutation.mutate({
-      contractNumber,
-      ...(teamName !== undefined && { teamName }),
-      ...(contractor !== undefined && { contractor }),
-      ...(startDate !== undefined && { startDate }),
-      ...(endDate !== undefined && { endDate }),
-      ...(pStatus !== undefined && { projectStatus: pStatus }),
-      ...(operationRate !== undefined && { operationRate }),
-      ...(department !== undefined && { departmentName: department }),
-      unitPrices,
-    });
-  };
-
-  useEffect(() => {
-    if (data && data.ok) {
-      setContractor(data.data.contractor);
-      setDepartment(data.data.departmentName);
-      setTeamName(data.data.teamName);
-      setPStatus(data.data.projectStatus);
-      setOperationRate(data.data.operationRate);
-      setStartDate(data.data.startDate);
-      setEndDate(data.data.endDate);
-      setUnitPrices(data.data.unitPrices);
-    }
-  }, [data]);
-
+  const isContractNumberError =
+    contractNumber === undefined || contractNumber === "";
   const isContractorError = contractor === undefined || contractor === "";
   const isDepartmentError = department === undefined || department === "";
   const isTeamNameError = teamName === undefined || teamName === "";
@@ -229,11 +218,11 @@ export default function ProjectEdit() {
   return (
     <>
       <Helmet>
-        <title>{`프로젝트 - ${contractNumber}`}</title>
+        <title>{`프로젝트 생성`}</title>
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          프로젝트 수정
+          프로젝트 등록
         </Text>
       </Box>
       <HStack justifyContent={"space-between"}>
@@ -248,9 +237,10 @@ export default function ProjectEdit() {
         <Button
           size={"sm"}
           colorScheme="teal"
-          onClick={onEdit}
-          isLoading={editMutation.isPending}
+          onClick={onRegister}
+          isLoading={registerMutation.isPending}
           isDisabled={
+            isContractNumberError ||
             isContractorError ||
             isDepartmentError ||
             isTeamNameError ||
@@ -259,43 +249,42 @@ export default function ProjectEdit() {
             isConfiguredUnitPriceError
           }
         >
-          수정
+          등록
         </Button>
       </HStack>
-      <Skeleton
-        isLoaded={!isLoading && !departmentsLoading}
-        height={"50%"}
-        fadeDuration={3}
-      >
-        {data && data.ok && departments && departments.ok && (
+      <Skeleton isLoaded={!departmentsLoading} height={"50%"} fadeDuration={3}>
+        {departments && departments.ok && (
           <HStack marginTop={10}>
             <Flex w={"100%"}>
               <Box flex={1} w={"50%"} h={"100%"}>
                 <VStack p={2}>
-                  <FormControl marginTop={2} isRequired>
+                  <FormControl
+                    marginTop={2}
+                    isRequired
+                    isInvalid={isContractNumberError}
+                  >
                     <FormLabel>계약번호</FormLabel>
                     <Input
                       size="md"
                       type="text"
-                      value={data?.data.contractNumber}
-                      disabled
+                      value={contractNumber}
+                      onChange={handleContractNumber}
                     />
+                    {isContractNumberError && (
+                      <FormErrorMessage>필수 필드입니다.</FormErrorMessage>
+                    )}
                   </FormControl>
 
                   <FormControl
                     marginTop={2}
                     isRequired
-                    isInvalid={isLoading && isContractorError}
+                    isInvalid={isContractorError}
                   >
                     <FormLabel>원청</FormLabel>
                     <Input
                       size="md"
                       type="text"
-                      value={
-                        contractor === undefined
-                          ? data.data.contractor
-                          : contractor
-                      }
+                      value={contractor}
                       focusBorderColor={primaryColor}
                       onChange={handleContractor}
                     />
@@ -307,7 +296,7 @@ export default function ProjectEdit() {
                   <FormControl
                     marginTop={2}
                     isRequired
-                    isInvalid={isLoading && isDepartmentError}
+                    isInvalid={isDepartmentError}
                   >
                     <FormLabel>부서</FormLabel>
                     <ChakraSelect
@@ -330,15 +319,13 @@ export default function ProjectEdit() {
                   <FormControl
                     marginTop={2}
                     isRequired
-                    isInvalid={isLoading && isTeamNameError}
+                    isInvalid={isTeamNameError}
                   >
                     <FormLabel>팀명</FormLabel>
                     <Input
                       size="md"
                       type="text"
-                      value={
-                        teamName === undefined ? data.data.teamName : teamName
-                      }
+                      value={teamName}
                       focusBorderColor={primaryColor}
                       onChange={handleTeamName}
                     />
@@ -351,7 +338,6 @@ export default function ProjectEdit() {
                     <FormLabel>상태</FormLabel>
                     <RadioGroup
                       value={pStatus}
-                      defaultValue={data.data.projectStatus}
                       onChange={handleProjectStatus}
                       colorScheme={"teal"}
                     >
@@ -366,7 +352,6 @@ export default function ProjectEdit() {
                     <FormLabel>가동률</FormLabel>
                     <RadioGroup
                       value={operationRate}
-                      defaultValue={data.data.operationRate}
                       onChange={handleOperationRate}
                       colorScheme={"teal"}
                     >
@@ -385,13 +370,13 @@ export default function ProjectEdit() {
                       marginTop={2}
                       marginRight={5}
                       isRequired
-                      isInvalid={isLoading && isStartDateError}
+                      isInvalid={isStartDateError}
                     >
                       <FormLabel>시작일</FormLabel>
                       <Input
                         size="md"
                         type="date"
-                        value={startDate ? startDate : data.data.startDate}
+                        value={startDate}
                         focusBorderColor={primaryColor}
                         onChange={handleStartDate}
                       />
@@ -403,13 +388,13 @@ export default function ProjectEdit() {
                     <FormControl
                       marginTop={2}
                       isRequired
-                      isInvalid={isLoading && isEndDateError}
+                      isInvalid={isEndDateError}
                     >
                       <FormLabel>종료일</FormLabel>
                       <Input
                         size="md"
                         type="date"
-                        value={endDate ? endDate : data.data.endDate}
+                        value={endDate}
                         focusBorderColor={primaryColor}
                         onChange={handleEndDate}
                       />
@@ -491,7 +476,7 @@ export default function ProjectEdit() {
                   <Box w={"100%"}>
                     <FormControl
                       isRequired
-                      isInvalid={isLoading && isConfiguredUnitPriceError}
+                      isInvalid={isConfiguredUnitPriceError}
                     >
                       <FormLabel>설정단가</FormLabel>
                       <Grid

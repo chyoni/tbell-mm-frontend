@@ -2,6 +2,7 @@ import { Flex, Text } from "@chakra-ui/react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useRouteError } from "react-router-dom";
+import { primaryColor } from "../theme";
 
 export default function ErrorPage() {
   const error = useRouteError();
@@ -26,7 +27,7 @@ export default function ErrorPage() {
           Sorry, an unexpected error has occurred.
         </Text>
         <Link to={"/"}>
-          <Text ml={5} color={"#0ED3AC"}>
+          <Text ml={5} color={primaryColor}>
             Go home &rarr;
           </Text>
         </Link>
