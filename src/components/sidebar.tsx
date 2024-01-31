@@ -149,7 +149,7 @@ export default function Sidebar() {
               }
             >
               <Icon as={FaTableCells} />
-              <Text ml={3}>프로젝트 별 사원 투입현황</Text>
+              <Text ml={3}>프로젝트별 사원 투입현황</Text>
             </Link>
 
             <Link
