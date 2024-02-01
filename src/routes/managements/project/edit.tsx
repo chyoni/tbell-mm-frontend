@@ -32,7 +32,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { primaryColor } from "../../../theme";
 import { IGetDepartments } from "../../../types/department";
 import { convertLevelEnToKo, unitPriceLv } from "../../../utils";
-import { IErrorResponse, IResponse, Option } from "../../../types/common";
+import { IErrorResponse, Option } from "../../../types/common";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { getDepartments } from "../../../api/departments";
 import { editProject, getProject } from "../../../api/projects";

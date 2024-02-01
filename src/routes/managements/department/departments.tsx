@@ -116,7 +116,7 @@ export default function Departments() {
       </Box>
       <HStack marginBottom={5} spacing={8}>
         <Box width={"max-content"} alignItems={"center"} display={"flex"}>
-          <Text fontWeight={"hairline"} width={20}>
+          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
             부서명
           </Text>
           <Input

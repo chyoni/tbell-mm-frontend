@@ -31,8 +31,8 @@ import Pagination from "../../../components/pagination";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IGetEmployee, IGetEmployees } from "../../../types/employee";
 import { deleteEmployee, getEmployees } from "../../../api/employees";
-import { Link, useNavigate } from "react-router-dom";
-import { IErrorResponse, IResponse } from "../../../types/common";
+import { Link } from "react-router-dom";
+import { IErrorResponse } from "../../../types/common";
 
 export default function Employees() {
   const toast = useToast();
@@ -47,7 +47,10 @@ export default function Employees() {
   const goToLastPage = (lastPage: number) => setPage(lastPage);
   // 특정 페이지 지정 Function
   const goToSpecificPage = (page: number) => setPage(page);
+
   const [searchName, setSearchName] = useState<string>("");
+  const [searchEmployeeNumber, setSearchEmployeeNumber] = useState<string>("");
+  const [searchStartDate, setSearchStartDate] = useState<string>("");
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
@@ -55,11 +58,12 @@ export default function Employees() {
       searchByCond();
     }
   };
-  const searchByCond = () => {};
+  const searchByCond = async () => await refetch();
 
-  const { isLoading, data } = useQuery<IGetEmployees, Error>({
+  const { isLoading, data, refetch } = useQuery<IGetEmployees, Error>({
     queryKey: ["employees"],
-    queryFn: () => getEmployees(page, 10, searchName),
+    queryFn: () =>
+      getEmployees(page, 10, searchName, searchEmployeeNumber, searchStartDate),
     refetchOnWindowFocus: true,
   });
 
@@ -112,7 +116,22 @@ export default function Employees() {
       </Box>
       <HStack marginBottom={5} spacing={8}>
         <Box width={"max-content"} alignItems={"center"} display={"flex"}>
-          <Text fontWeight={"hairline"} width={20}>
+          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
+            사번
+          </Text>
+          <Input
+            onChange={(event) => setSearchEmployeeNumber(event.target.value)}
+            placeholder="20200102"
+            size="sm"
+            type="text"
+            value={searchEmployeeNumber}
+            width={200}
+            focusBorderColor={primaryColor}
+            onKeyUp={handleKeyUp}
+          />
+        </Box>
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
             사원명
           </Text>
           <Input
@@ -124,6 +143,18 @@ export default function Employees() {
             width={200}
             focusBorderColor={primaryColor}
             onKeyUp={handleKeyUp}
+          />
+        </Box>
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={"60px"} marginRight={2}>
+            입사일
+          </Text>
+          <Input
+            size="md"
+            type="date"
+            value={searchStartDate}
+            focusBorderColor={primaryColor}
+            onChange={(event) => setSearchStartDate(event.target.value)}
           />
         </Box>
         <Button
@@ -167,11 +198,11 @@ export default function Employees() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th>사번</Th>
-                  <Th>이름</Th>
-                  <Th>입사일</Th>
-                  <Th>퇴사일</Th>
-                  <Th>작업</Th>
+                  <Th w={"20%"}>사번</Th>
+                  <Th w={"20%"}>이름</Th>
+                  <Th w={"25%"}>입사일</Th>
+                  <Th w={"25%"}>퇴사일</Th>
+                  <Th w={"10%"}>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>

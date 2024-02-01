@@ -11,6 +11,7 @@ import DepartmentEdit from "./routes/managements/department/edit";
 import DepartmentRegister from "./routes/managements/department/register";
 import Employees from "./routes/managements/employee/employees";
 import EmployeeRegister from "./routes/managements/employee/register";
+import EmployeeEdit from "./routes/managements/employee/edit";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       {
         path: "/employees/register",
         element: <EmployeeRegister />,
+      },
+      {
+        path: "/employees/edit/:employeeNumber",
+        element: <EmployeeEdit />,
       },
     ],
   },

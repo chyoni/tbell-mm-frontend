@@ -122,7 +122,7 @@ export default function Projects() {
       </Box>
       <HStack marginBottom={5} spacing={8}>
         <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={1} fontWeight={"hairline"} width={120}>
+          <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
             연도 (시작일 기준)
           </Text>
           <Input
@@ -137,7 +137,7 @@ export default function Projects() {
           />
         </Box>
         <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={1} fontWeight={"hairline"} width={30}>
+          <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
             팀명
           </Text>
           <Input

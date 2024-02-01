@@ -8,15 +8,19 @@ import { instance } from "./instance";
 export const getEmployees = async (
   page: number,
   size: number,
-  employeeName?: string
+  name?: string,
+  employeeNumber?: string,
+  startDate?: string
 ): Promise<IGetEmployees> =>
   instance
     .get("employees", {
       params: {
         page,
         size,
-        ...(employeeName !== undefined &&
-          employeeName !== "" && { employeeName }),
+        ...(name !== undefined && name !== "" && { name }),
+        ...(employeeNumber !== undefined &&
+          employeeNumber !== "" && { employeeNumber }),
+        ...(startDate !== undefined && startDate !== "" && { startDate }),
       },
     })
     .then((res) => res.data);
@@ -35,6 +39,30 @@ export const createEmployee = async (
   instance
     .post(
       `employees`,
+      {
+        employeeNumber,
+        name,
+        startDate,
+        ...(resignationDate && resignationDate !== "" && { resignationDate }),
+      },
+      { headers: { "Content-Type": "application/json" } }
+    )
+    .then((res) => res.data);
+
+export const getEmployeeByEmployeeNumber = async (
+  employeeNumber: string
+): Promise<IGetEmployee> =>
+  instance.get(`employees/${employeeNumber}`).then((res) => res.data);
+
+export const editEmployeeByEmployeeNumber = async (
+  employeeNumber: string,
+  name: string,
+  startDate: string,
+  resignationDate: string
+): Promise<IGetEmployee> =>
+  instance
+    .put(
+      `employees/${employeeNumber}`,
       {
         employeeNumber,
         name,
