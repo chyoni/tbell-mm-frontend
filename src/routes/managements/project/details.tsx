@@ -23,13 +23,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getProject } from "../../../api/projects";
 import { IGetProject } from "../../../types/project";
 import { useQuery } from "@tanstack/react-query";
+import { IErrorResponse } from "../../../types/common";
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
 
   const { contractNumber } = useParams();
 
-  const { isLoading, data } = useQuery<IGetProject, Error>({
+  const { isLoading, data } = useQuery<IGetProject, IErrorResponse>({
     queryKey: ["project", contractNumber],
     queryFn: () => getProject(contractNumber!),
     enabled: contractNumber !== undefined,

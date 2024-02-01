@@ -205,13 +205,15 @@ export default function Projects() {
               <Tbody>
                 {data?.data.content.map((p, index) => (
                   <Tr key={index}>
-                    <Td>{p.contractNumber}</Td>
-                    <Td>{p.departmentName}</Td>
-                    <Td>{p.teamName}</Td>
-                    <Td>{p.projectStatus === "YEAR" ? "연간" : "단건"}</Td>
-                    <Td>{p.startDate}</Td>
-                    <Td>{p.endDate}</Td>
-                    <Td>{p.contractor}</Td>
+                    <Td w={"15%"}>{p.contractNumber}</Td>
+                    <Td w={"15%"}>{p.departmentName}</Td>
+                    <Td w={"15%"}>{p.teamName}</Td>
+                    <Td w={"15%"}>
+                      {p.projectStatus === "YEAR" ? "연간" : "단건"}
+                    </Td>
+                    <Td w={"15%"}>{p.startDate}</Td>
+                    <Td w={"15%"}>{p.endDate}</Td>
+                    <Td w={"10%"}>{p.contractor}</Td>
                     <Td>
                       <HStack spacing={2}>
                         <Button size={"xs"} colorScheme="teal">
@@ -231,6 +233,18 @@ export default function Projects() {
                           }}
                         >
                           삭제
+                        </Button>
+                        <Button size={"xs"} colorScheme={"messenger"}>
+                          <Link to={`/statistics/projects/${p.contractNumber}`}>
+                            투입 현황
+                          </Link>
+                        </Button>
+                        <Button size={"xs"} colorScheme={"messenger"}>
+                          <Link
+                            to={`/statistics/projects/${p.contractNumber}/employee`}
+                          >
+                            인력 투입
+                          </Link>
                         </Button>
                         <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
                           <ModalOverlay />

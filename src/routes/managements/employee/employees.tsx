@@ -60,7 +60,7 @@ export default function Employees() {
   };
   const searchByCond = async () => await refetch();
 
-  const { isLoading, data, refetch } = useQuery<IGetEmployees, Error>({
+  const { isLoading, data, refetch } = useQuery<IGetEmployees, IErrorResponse>({
     queryKey: ["employees"],
     queryFn: () =>
       getEmployees(page, 10, searchName, searchEmployeeNumber, searchStartDate),

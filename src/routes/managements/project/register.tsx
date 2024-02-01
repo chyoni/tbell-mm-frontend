@@ -272,6 +272,7 @@ export default function ProjectRegister() {
                       size="md"
                       type="text"
                       value={contractNumber}
+                      focusBorderColor={primaryColor}
                       onChange={handleContractNumber}
                     />
                     {isContractNumberError && (

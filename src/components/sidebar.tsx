@@ -41,7 +41,7 @@ export default function Sidebar() {
   const [currentTitle, setCurrentTitle] = useState<Title>(
     url.pathname === "/"
       ? Title.Dashboard
-      : url.pathname === "/statistics/projects"
+      : url.pathname.match("/statistics/projects/*") !== null
       ? Title.StatisticsProject
       : url.pathname === "/statistics/employee"
       ? Title.StatisticsEmployee
@@ -78,7 +78,7 @@ export default function Sidebar() {
     setCurrentTitle(
       url.pathname === "/"
         ? Title.Dashboard
-        : url.pathname === "/statistics/projects"
+        : url.pathname.match("/statistics/projects/*") !== null
         ? Title.StatisticsProject
         : url.pathname === "/statistics/employee"
         ? Title.StatisticsEmployee
@@ -264,6 +264,7 @@ export default function Sidebar() {
                       <Icon as={FaListOl} />
                       <Text ml={3}>프로젝트 리스트</Text>
                     </Link>
+
                     <Link
                       to={"/projects/register"}
                       onClick={() => setCurrentTitle(Title.RegisterProject)}
