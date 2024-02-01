@@ -10,6 +10,7 @@ import Departments from "./routes/managements/department/departments";
 import DepartmentEdit from "./routes/managements/department/edit";
 import DepartmentRegister from "./routes/managements/department/register";
 import Employees from "./routes/managements/employee/employees";
+import EmployeeRegister from "./routes/managements/employee/register";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: "/employees",
         element: <Employees />,
+      },
+      {
+        path: "/employees/register",
+        element: <EmployeeRegister />,
       },
     ],
   },

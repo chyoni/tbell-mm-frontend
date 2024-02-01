@@ -17,7 +17,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { ICRUDDepartmentRes } from "../../../types/department";
-import { IResponse } from "../../../types/common";
+import { IErrorResponse } from "../../../types/common";
 import { editDepartment } from "../../../api/departments";
 import { primaryColor } from "../../../theme";
 
@@ -49,7 +49,7 @@ export default function DepartmentEdit() {
     editMutation.mutate();
   };
 
-  const editMutation = useMutation<ICRUDDepartmentRes, IResponse>({
+  const editMutation = useMutation<ICRUDDepartmentRes, IErrorResponse>({
     mutationFn: () => editDepartment(departmentName!, updateDepartmentName!),
     onSuccess: () => {
       toast({
@@ -63,7 +63,7 @@ export default function DepartmentEdit() {
       console.log(error);
       toast({
         title: `수정 실패`,
-        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
+        description: `${error.response.data.errorMessage}`,
         status: "error",
         duration: 3000,
         isClosable: true,

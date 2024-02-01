@@ -32,7 +32,7 @@ import { primaryColor } from "../../../theme";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICRUDDepartmentRes, IGetDepartments } from "../../../types/department";
 import { deleteDepartment, getDepartments } from "../../../api/departments";
-import { IResponse } from "../../../types/common";
+import { IErrorResponse } from "../../../types/common";
 
 export default function Departments() {
   const toast = useToast();
@@ -78,7 +78,7 @@ export default function Departments() {
     deleteMutation.mutate();
   };
 
-  const deleteMutation = useMutation<ICRUDDepartmentRes, IResponse>({
+  const deleteMutation = useMutation<ICRUDDepartmentRes, IErrorResponse>({
     mutationFn: () => deleteDepartment(deleteDepartmentName),
     onSuccess: () => {
       toast({
@@ -97,7 +97,7 @@ export default function Departments() {
       console.log(error);
       toast({
         title: `삭제 실패`,
-        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
+        description: `${error.response.data.errorMessage}`,
         status: "error",
         duration: 3000,
         isClosable: true,

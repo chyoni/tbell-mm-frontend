@@ -17,7 +17,7 @@ import React, { ChangeEvent, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { ICRUDDepartmentRes } from "../../../types/department";
-import { IResponse } from "../../../types/common";
+import { IErrorResponse } from "../../../types/common";
 import { createDepartment } from "../../../api/departments";
 import { primaryColor } from "../../../theme";
 
@@ -35,7 +35,7 @@ export default function DepartmentRegister() {
     registerMutation.mutate();
   };
 
-  const registerMutation = useMutation<ICRUDDepartmentRes, IResponse>({
+  const registerMutation = useMutation<ICRUDDepartmentRes, IErrorResponse>({
     mutationFn: () => createDepartment(departmentName),
     onSuccess: () => {
       toast({
@@ -52,7 +52,7 @@ export default function DepartmentRegister() {
       console.log(error);
       toast({
         title: `등록 실패`,
-        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
+        description: `${error.response.data.errorMessage}`,
         status: "error",
         duration: 3000,
         isClosable: true,

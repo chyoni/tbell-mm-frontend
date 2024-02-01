@@ -7,3 +7,11 @@ export interface Option {
   label: string;
   value: string;
 }
+
+export interface IErrorResponse {
+  code: string;
+  response: {
+    data: IResponse;
+    status: number;
+  };
+}

@@ -22,17 +22,20 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { primaryColor } from "../../../theme";
 import Pagination from "../../../components/pagination";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { IGetEmployees } from "../../../types/employee";
-import { getEmployees } from "../../../api/employees";
-import { Link } from "react-router-dom";
+import { IGetEmployee, IGetEmployees } from "../../../types/employee";
+import { deleteEmployee, getEmployees } from "../../../api/employees";
+import { Link, useNavigate } from "react-router-dom";
+import { IErrorResponse, IResponse } from "../../../types/common";
 
 export default function Employees() {
+  const toast = useToast();
   const [page, setPage] = useState<number>(0);
   // 첫번째 페이지 Function
   const goToFirstPage = () => setPage(0);
@@ -57,6 +60,7 @@ export default function Employees() {
   const { isLoading, data } = useQuery<IGetEmployees, Error>({
     queryKey: ["employees"],
     queryFn: () => getEmployees(page, 10, searchName),
+    refetchOnWindowFocus: true,
   });
 
   const {
@@ -71,7 +75,31 @@ export default function Employees() {
     deleteMutation.mutate();
   };
 
-  const deleteMutation = useMutation();
+  const deleteMutation = useMutation<IGetEmployee, IErrorResponse>({
+    mutationFn: () => deleteEmployee(deleteEmployeeNumber),
+    onSuccess: () => {
+      toast({
+        title: `삭제 완료`,
+        status: "success",
+        duration: 1200,
+        isClosable: true,
+      });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `삭제 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
   return (
     <>
       <Helmet>
@@ -174,8 +202,9 @@ export default function Employees() {
                             <ModalHeader>사원 삭제</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
-                              이 작업은 되돌릴 수 없습니다. 정말로 삭제
-                              하시겠습니까?
+                              이 작업은 되돌릴 수 없으며 해당 유저가 가진
+                              프로젝트 수행 현황에도 영향을 미치게 됩니다. 정말
+                              삭제 하시겠습니까?
                             </ModalBody>
                             <ModalFooter>
                               <Button

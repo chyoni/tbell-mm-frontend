@@ -11,3 +11,11 @@ export interface IEmployee {
 export interface IGetEmployees extends IResponse {
   data: IGetData<IEmployee>;
 }
+
+export interface IGetEmployee extends IResponse {
+  data: IEmployee;
+}
+
+export interface ICreateEmployeeRes extends IResponse {
+  data: { employeeNumber: string; name: string };
+}

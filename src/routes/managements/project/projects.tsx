@@ -32,7 +32,7 @@ import { deleteProject, getProjects } from "../../../api/projects";
 import { ICUDProjectResponse, IGetProjects } from "../../../types/project";
 import { primaryColor } from "../../../theme";
 import Pagination from "../../../components/pagination";
-import { IResponse } from "../../../types/common";
+import { IErrorResponse } from "../../../types/common";
 
 export default function Projects() {
   const toast = useToast();
@@ -77,7 +77,7 @@ export default function Projects() {
 
   const [deleteContractNumber, setDeleteContractNumber] = useState<string>("");
 
-  const deleteMutation = useMutation<ICUDProjectResponse, IResponse>({
+  const deleteMutation = useMutation<ICUDProjectResponse, IErrorResponse>({
     mutationFn: () => deleteProject(deleteContractNumber),
     onSuccess: () => {
       toast({
@@ -96,7 +96,7 @@ export default function Projects() {
       console.log(error);
       toast({
         title: `삭제 실패`,
-        description: `문제가 발생했습니다. 담당자에게 문의해 주세요.`,
+        description: `${error.response.data.errorMessage}`,
         status: "error",
         duration: 3000,
         isClosable: true,
