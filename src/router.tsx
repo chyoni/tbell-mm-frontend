@@ -12,9 +12,9 @@ import DepartmentRegister from "./routes/managements/department/register";
 import Employees from "./routes/managements/employee/employees";
 import EmployeeRegister from "./routes/managements/employee/register";
 import EmployeeEdit from "./routes/managements/employee/edit";
-import ProjectMm from "./routes/statistics/project/mm";
 import ProjectStatisticsList from "./routes/statistics/project/list";
 import ProjectStatisticsAddEmployee from "./routes/statistics/project/add-employee";
+import ProjectStatisticsCurrentCondition from "./routes/statistics/project/current-condition";
 
 const router = createBrowserRouter([
   {
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/statistics/projects/:contractNumber",
-        element: <ProjectMm />,
+        element: <ProjectStatisticsCurrentCondition />,
       },
       {
         path: "/statistics/projects/:contractNumber/employee",

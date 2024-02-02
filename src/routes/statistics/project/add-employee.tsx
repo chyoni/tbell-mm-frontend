@@ -11,6 +11,7 @@ import {
   FormLabel,
   Input,
   FormHelperText,
+  useToast,
 } from "@chakra-ui/react";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -25,11 +26,12 @@ import { getProject } from "../../../api/projects";
 import { primaryColor } from "../../../theme";
 import { IGetEmployees } from "../../../types/employee";
 import { getEmployees } from "../../../api/employees";
-import { convertLevelEnToKo, unitPriceLv } from "../../../utils";
+import { convertLevelEnToKo } from "../../../utils";
 
 export default function ProjectStatisticsAddEmployee() {
   const { contractNumber } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const { isLoading: projectLoading, data: projectData } = useQuery<
     IGetProject,
@@ -70,13 +72,13 @@ export default function ProjectStatisticsAddEmployee() {
       const levelByProject: { label: string; value: string }[] = [];
 
       projectData.data.unitPrices.map((unitPrice) => {
-        Object.entries(unitPrice).map((level) => {
+        return Object.entries(unitPrice).map((level) => {
           let option = {
             label: convertLevelEnToKo(level[0]),
             value: level[0],
           };
 
-          levelByProject.push(option);
+          return levelByProject.push(option);
         });
       });
       setLevelSelectOptions(levelByProject);
@@ -84,7 +86,38 @@ export default function ProjectStatisticsAddEmployee() {
   }, [projectData]);
 
   const onAddEmployee = () => {
-    console.log(employee, startDate, level);
+    if (
+      level === null ||
+      level === undefined ||
+      employee === null ||
+      employee === undefined ||
+      startDate === null ||
+      startDate === undefined ||
+      contractNumber === null ||
+      contractNumber === undefined ||
+      projectData === undefined
+    )
+      return;
+
+    const employeeStartDate = new Date(startDate);
+    const projectStartDate = new Date(projectData.data.startDate);
+    const projectEndDate = new Date(projectData.data.endDate);
+
+    if (
+      projectStartDate > employeeStartDate ||
+      employeeStartDate >= projectEndDate
+    ) {
+      toast({
+        title: `등록 실패 - [투입일]`,
+        description: `투입일은 프로젝트 기간 범위에 속해야 합니다.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    addEmployeeMutation.mutate();
   };
 
   const onEmployeeChange = (
@@ -125,8 +158,24 @@ export default function ProjectStatisticsAddEmployee() {
         startDate,
         level!.value
       ),
-    onSuccess: () => {},
-    onError: (error) => {},
+    onSuccess: () => {
+      toast({
+        title: `등록 완료`,
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `등록 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
   });
 
   const isEmployeeError = employee === undefined || employee === null;
@@ -135,12 +184,25 @@ export default function ProjectStatisticsAddEmployee() {
   return (
     <>
       <Helmet>
-        <title>{`프로젝트 - ${contractNumber} 인력 투입`}</title>
+        <title>{`프로젝트 - ${projectData?.data.teamName} 인력 투입`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          {`[${projectData?.data.teamName}] 인력 투입`}
-        </Text>
+        <Flex direction={"column"}>
+          <Text fontWeight={"semibold"} fontSize={"2xl"}>
+            {`[${projectData?.data.teamName}] 인력 투입`}
+          </Text>
+          <Flex>
+            <Text fontSize={"small"} fontWeight={"hairline"}>
+              {projectData?.data.startDate}
+            </Text>
+            <Text fontSize={"small"} fontWeight={"hairline"} mx={3}>
+              -
+            </Text>
+            <Text fontSize={"small"} fontWeight={"hairline"}>
+              {projectData?.data.endDate}
+            </Text>
+          </Flex>
+        </Flex>
       </Box>
       <HStack justifyContent={"space-between"}>
         <Button

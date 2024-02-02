@@ -21,6 +21,17 @@ export interface IProject {
   unitPrices: IUnitPrice[];
 }
 
+export interface IProjectNotPrices {
+  contractNumber: string;
+  teamName: string;
+  contractor: string;
+  startDate: string;
+  endDate: string;
+  projectStatus: "YEAR" | "SINGLE";
+  operationRate: "INCLUDE" | "EXCEPT";
+  departmentName: string;
+}
+
 export interface IUnitPrice {
   [key: string]: number;
 }

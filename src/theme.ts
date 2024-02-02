@@ -16,6 +16,7 @@ const breakpoints = {
 };
 
 export const primaryColor = "#0ED3AC";
+export const titleColor = "#9F7AEA";
 
 const theme = extendTheme({ config, breakpoints });
 

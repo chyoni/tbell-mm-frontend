@@ -1,4 +1,7 @@
-import { ICreateEmployeeHistoryRes } from "../types/employee-history";
+import {
+  ICreateEmployeeHistoryRes,
+  IGetEmployeeHistories,
+} from "../types/employee-history";
 import { instance } from "./instance";
 
 export const addEmployeeHistory = (
@@ -18,4 +21,21 @@ export const addEmployeeHistory = (
       },
       { headers: { "Content-Type": "application/json" } }
     )
+    .then((res) => res.data);
+
+export const getEmployeeHistory = (
+  contractNumber: string,
+  year?: string,
+  employeeName?: string
+): Promise<IGetEmployeeHistories> =>
+  instance
+    .get(`history`, {
+      params: {
+        contractNumber,
+        ...(year && year !== undefined && year !== "" && { year }),
+        ...(employeeName &&
+          employeeName !== undefined &&
+          employeeName !== "" && { employeeName }),
+      },
+    })
     .then((res) => res.data);

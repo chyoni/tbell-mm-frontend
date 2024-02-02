@@ -6,6 +6,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+### `npx tailwindcss -i ./src/input.css -o ./src/output.css --watch`
+
+Tailwind CSS file generated.
+
 ### `npm start`
 
 Runs the app in the development mode.\
