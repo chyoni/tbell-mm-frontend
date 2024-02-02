@@ -104,146 +104,149 @@ export default function ProjectStatisticsCurrentCondition() {
           </Button>
         </HStack>
 
-        <Flex
-          border={"ButtonShadow"}
-          borderColor={primaryColor}
-          borderStyle={"double"}
-          borderRadius={10}
-          p={2}
-        >
-          <HStack spacing={10} w={"30%"}>
-            <Flex
-              direction={"column"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              w={"30%"}
-              py={6}
-              px={2}
-            >
-              <Text fontSize={"small"} color={primaryColor}>
-                사번
-              </Text>
-              <Text fontSize={"small"}>20200102</Text>
-            </Flex>
-
-            <Flex
-              direction={"column"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              w={"30%"}
-            >
-              <Text fontSize={"small"} color={primaryColor}>
-                이름
-              </Text>
-              <Text fontSize={"small"}>최치원</Text>
-            </Flex>
-
-            <Flex
-              direction={"column"}
-              alignItems={"flex-end"}
-              justifyContent={"center"}
-              w={"60%"}
-              px={2}
-              py={6}
-              mb={4}
-            >
-              <Text color={titleColor} fontSize={"smaller"}>
-                월 구분
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                실제 투입일
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                투입 MM
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                투입 금액
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                정산 MM
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                정산 등급
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                정산 금액
-              </Text>
-              <Text color={titleColor} fontSize={"smaller"}>
-                손익액
-              </Text>
-            </Flex>
-          </HStack>
-
-          <HStack overflowX={"scroll"} w={"70%"}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month, index) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(() => (
+          <Flex
+            border={"ButtonShadow"}
+            borderColor={primaryColor}
+            borderStyle={"double"}
+            borderRadius={10}
+            mb={10}
+            p={2}
+          >
+            <HStack spacing={10} w={"30%"}>
               <Flex
-                key={index}
                 direction={"column"}
-                py={4}
+                alignItems={"center"}
+                justifyContent={"center"}
+                w={"30%"}
+                py={6}
                 px={2}
-                borderLeft={1}
-                borderLeftWidth={1}
-                borderLeftStyle={"dashed"}
-                borderColor={"#e9e5e5"}
               >
-                <Flex alignItems={"center"} justifyContent={"center"}>
-                  <Text fontSize={"small"}>1월</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  w={"max-content"}
-                >
-                  <Text fontSize={"small"}>2020-01-02</Text>
-                  <Text mx={3}>|</Text>
-                  <Text fontSize={"small"}>2020-01-31</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>0.71</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>2,129,032</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>0.40</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>중급</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>2,400,000</Text>
-                </Flex>
-                <Flex
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  fontSize={"small"}
-                >
-                  <Text>270,968</Text>
-                </Flex>
+                <Text fontSize={"small"} color={primaryColor}>
+                  사번
+                </Text>
+                <Text fontSize={"small"}>20200102</Text>
               </Flex>
-            ))}
-          </HStack>
-        </Flex>
+
+              <Flex
+                direction={"column"}
+                alignItems={"center"}
+                justifyContent={"center"}
+                w={"30%"}
+              >
+                <Text fontSize={"small"} color={primaryColor}>
+                  이름
+                </Text>
+                <Text fontSize={"small"}>최치원</Text>
+              </Flex>
+
+              <Flex
+                direction={"column"}
+                alignItems={"flex-end"}
+                justifyContent={"center"}
+                w={"60%"}
+                px={2}
+                py={6}
+                mb={4}
+              >
+                <Text color={titleColor} fontSize={"smaller"}>
+                  월 구분
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  실제 투입일
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  투입 MM
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  투입 금액
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  정산 MM
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  정산 등급
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  정산 금액
+                </Text>
+                <Text color={titleColor} fontSize={"smaller"}>
+                  손익액
+                </Text>
+              </Flex>
+            </HStack>
+
+            <HStack overflowX={"scroll"} w={"70%"}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month, index) => (
+                <Flex
+                  key={index}
+                  direction={"column"}
+                  py={4}
+                  px={2}
+                  borderLeft={1}
+                  borderLeftWidth={1}
+                  borderLeftStyle={"dashed"}
+                  borderColor={"#e9e5e5"}
+                >
+                  <Flex alignItems={"center"} justifyContent={"center"}>
+                    <Text fontSize={"small"}>1월</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    w={"max-content"}
+                  >
+                    <Text fontSize={"small"}>2020-01-02</Text>
+                    <Text mx={3}>|</Text>
+                    <Text fontSize={"small"}>2020-01-31</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>0.71</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>2,129,032</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>0.40</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>중급</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>2,400,000</Text>
+                  </Flex>
+                  <Flex
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    fontSize={"small"}
+                  >
+                    <Text>270,968</Text>
+                  </Flex>
+                </Flex>
+              ))}
+            </HStack>
+          </Flex>
+        ))}
       </Skeleton>
     </>
   );

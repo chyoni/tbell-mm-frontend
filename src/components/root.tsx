@@ -17,7 +17,8 @@ export default function Root() {
           py={16}
           px={4}
           ml={{ sm: 64 }}
-          overflow={"hidden"}
+          overflowX={"hidden"}
+          overflowY={"scroll"}
         >
           <Outlet />
         </Box>
