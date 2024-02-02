@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   HStack,
+  Icon,
   Input,
   Skeleton,
   Text,
@@ -15,12 +16,14 @@ import { IErrorResponse } from "../../../types/common";
 import { getEmployeeHistory } from "../../../api/employee-history";
 import { Helmet } from "react-helmet-async";
 import { primaryColor, titleColor } from "../../../theme";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { IGetProject } from "../../../types/project";
 import { getProject } from "../../../api/projects";
+import { FaArrowLeft } from "react-icons/fa6";
 
 export default function ProjectStatisticsCurrentCondition() {
   const { contractNumber } = useParams();
+  const navigate = useNavigate();
   const [searchYear, setSearchYear] = useState<string>("");
   const [searchEmployeeName, setSearchEmployeeName] = useState<string>("");
 
@@ -58,11 +61,20 @@ export default function ProjectStatisticsCurrentCondition() {
         <title>{`투입 현황 ${contractNumber}`}</title>
       </Helmet>
       <Skeleton isLoaded={!projectLoading && !isLoading}>
-        <Box marginBottom={5}>
+        <HStack marginBottom={5}>
+          <Button
+            variant={"ghost"}
+            size={"sm"}
+            colorScheme="teal"
+            onClick={() => navigate(-1)}
+          >
+            <Icon as={FaArrowLeft} />
+          </Button>
           <Text fontWeight={"semibold"} fontSize={"2xl"}>
             {`[${projectData?.data.teamName}] 투입 현황`}
           </Text>
-        </Box>
+        </HStack>
+
         <HStack marginBottom={5} spacing={8}>
           <Box width={"min-content"} alignItems={"center"} display={"flex"}>
             <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
