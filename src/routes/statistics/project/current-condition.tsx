@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
-  Divider,
   Flex,
   HStack,
   Icon,
@@ -159,7 +158,7 @@ export default function ProjectStatisticsCurrentCondition() {
                 w={"60%"}
                 px={2}
                 py={6}
-                mb={4}
+                mb={2}
               >
                 <Text color={titleColor} fontSize={"smaller"}>
                   월 구분

@@ -662,6 +662,7 @@ video {
 
 ::-webkit-scrollbar {
   width: 3px;
+  height: 4px;
   scrollbar-width: thin;
 }
 
