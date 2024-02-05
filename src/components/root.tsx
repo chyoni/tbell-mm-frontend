@@ -18,7 +18,7 @@ export default function Root() {
           px={4}
           ml={{ sm: 64 }}
           overflowX={"hidden"}
-          overflowY={"scroll"}
+          overflowY={"auto"}
         >
           <Outlet />
         </Box>
