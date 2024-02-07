@@ -14,6 +14,21 @@ export interface ICreateEmployeeHistoryRes extends IResponse {
   };
 }
 
+export interface ManMonth {
+  id: number;
+  year: number;
+  month: number;
+  durationStart: string;
+  durationEnd: string;
+  inputManMonth: string;
+  monthSalary?: number;
+  inputPrice?: number;
+  calculateManMonth?: string;
+  calculateLevel: string;
+  calculatePrice?: number;
+  plPrice?: number;
+}
+
 export interface IEmployeeHistory {
   id: number;
   employee: IEmployee;
@@ -21,6 +36,7 @@ export interface IEmployeeHistory {
   startDate: string;
   level: string;
   worth: number;
+  mms: ManMonth[];
 }
 
 export interface IGetEmployeeHistories extends IResponse {

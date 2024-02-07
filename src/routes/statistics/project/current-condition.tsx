@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -10,7 +10,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { IGetEmployeeHistories } from "../../../types/employee-history";
+import {
+  IEmployeeHistory,
+  IGetEmployeeHistories,
+} from "../../../types/employee-history";
 import { IErrorResponse } from "../../../types/common";
 import { getEmployeeHistory } from "../../../api/employee-history";
 import { Helmet } from "react-helmet-async";
@@ -57,9 +60,83 @@ export default function ProjectStatisticsCurrentCondition() {
     if (e.key === "Enter") searchByCond();
   };
 
-  const searchByCond = async () => await refetch();
+  const searchByCond = async () => {
+    await refetch();
+  };
 
   console.log(data, projectData);
+
+  const [employeeHistory, setEmployeeHistory] = useState<IEmployeeHistory[]>(
+    []
+  );
+  const [salaryInputs, setSalaryInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
+
+  useEffect(() => {
+    if (data && data.ok) {
+      let salaryInputsValues: { [key: string]: string } = {};
+
+      data.data.content.forEach((history) => {
+        history.mms.forEach((mm) => {
+          /*  기존 값을 남기는 방식
+          if (
+            salaryInputsValues[`${history.id}-${mm.id}`] === "" ||
+            salaryInputsValues[`${history.id}-${mm.id}`] === undefined
+          ) {
+            salaryInputsValues[`${history.id}-${mm.id}`] = "";
+          } 
+          */
+
+          // 기존값을 지우는 방식
+          salaryInputsValues[`${history.id}-${mm.id}`] = "";
+        });
+      });
+
+      setEmployeeHistory(data.data.content);
+      setSalaryInputs(salaryInputsValues);
+    }
+  }, [data]);
+
+  const handleSalary = (
+    event: ChangeEvent<HTMLInputElement>,
+    employeeHistoryId: number,
+    manMonthId: number
+  ) => {
+    // 급여 입력 필드값
+    const salary = +event.target.value.replaceAll(",", "");
+    // Copy employeeHistory state
+    const updatedEmployeeHistory = [...employeeHistory];
+    // 파라미터로 받은 employeeHistoryId를 통해 updatedEmployeeHistory에서 변경하고자 하는 history 객체를 찾는다.
+    const indexToUpdateEmployeeHistory = updatedEmployeeHistory.findIndex(
+      (h) => h.id === employeeHistoryId
+    );
+    // 파라미터로 받은 manMonthId를 통해 위에서 찾은 history의 객체에서 변경할 mm 객체를 mms 리스트에서 찾는다.
+    const indexToUpdateManMonth = updatedEmployeeHistory[
+      indexToUpdateEmployeeHistory
+    ].mms.findIndex((mm) => mm.id === manMonthId);
+    // 위에서 찾은 history 객체와 그 객체의 mms 리스트에서 변경할 mm 객체의 inputManMonth 값을 가져온다.
+    const inputManMonth =
+      +updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
+        indexToUpdateManMonth
+      ].inputManMonth;
+
+    // 변경할 mm 객체에 대해서 기존값은 그대로 두고 inputPrice의 값을 수정(추가)한다.
+    updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
+      indexToUpdateManMonth
+    ] = {
+      ...updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
+        indexToUpdateManMonth
+      ],
+      inputPrice: salary * inputManMonth,
+    };
+    // 변경한 employeeHistory를 적용한다.
+    setEmployeeHistory(updatedEmployeeHistory);
+
+    const copySalaryInputs = salaryInputs;
+    copySalaryInputs[`${employeeHistoryId}-${manMonthId}`] = salary.toString();
+    setSalaryInputs(copySalaryInputs);
+  };
 
   return (
     <>
@@ -135,7 +212,7 @@ export default function ProjectStatisticsCurrentCondition() {
             </Text>
             <Input
               onChange={(event) => setSearchYear(event.target.value)}
-              placeholder="YYYY"
+              placeholder={new Date().getFullYear().toString()}
               size="sm"
               type="text"
               value={searchYear}
@@ -173,16 +250,14 @@ export default function ProjectStatisticsCurrentCondition() {
         {/* 화면 중단 리스트 */}
         {data &&
           data.ok &&
-          data.data.content.length > 0 &&
-          data.data.content.map((emp, index) => (
+          employeeHistory.length > 0 &&
+          employeeHistory.map((emp, index) => (
             <Flex
               key={index}
               border={"ButtonShadow"}
               borderColor={primaryColor}
               borderStyle={"double"}
               borderRadius={10}
-              mb={10}
-              p={2}
             >
               <HStack spacing={10} w={"30%"}>
                 <Flex
@@ -211,107 +286,180 @@ export default function ProjectStatisticsCurrentCondition() {
                   <Text fontSize={"small"}>{emp.employee.name}</Text>
                 </Flex>
 
-                <Flex
-                  direction={"column"}
-                  alignItems={"flex-end"}
-                  justifyContent={"center"}
-                  w={"60%"}
-                  px={2}
-                  py={6}
-                  mb={2}
-                >
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    월 구분
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    실제 투입일
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    투입 MM
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    투입 금액
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    정산 MM
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    정산 등급
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    정산 금액
-                  </Text>
-                  <Text color={titleColor} fontSize={"smaller"}>
-                    손익액
-                  </Text>
-                </Flex>
+                <Box w={"60%"} px={2} py={6} mb={2}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      월 구분
+                    </Text>
+                  </Flex>
+                  <Flex h={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      실제 투입일
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      투입 MM
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      급여
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      투입 금액
+                    </Text>
+                  </Flex>
+
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      정산 MM
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      정산 등급
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      정산 금액
+                    </Text>
+                  </Flex>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
+                      손익액
+                    </Text>
+                  </Flex>
+                </Box>
               </HStack>
 
-              <HStack overflowX={"scroll"} w={"70%"}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month, index) => (
+              <HStack overflowX={"auto"} w={"70%"}>
+                {emp.mms.map((month, index) => (
                   <Flex
                     key={index}
                     direction={"column"}
                     py={4}
                     px={2}
-                    borderLeft={1}
-                    borderLeftWidth={1}
-                    borderLeftStyle={"dashed"}
-                    borderColor={"#e9e5e5"}
+                    borderStyle={"outset"}
+                    borderWidth={1}
+                    borderColor={"Background"}
+                    mb={2}
+                    justifyContent={"flex-start"}
                   >
-                    <Flex alignItems={"center"} justifyContent={"center"}>
-                      <Text fontSize={"small"}>1월</Text>
-                    </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
+                      height={5}
+                    >
+                      <Text fontSize={"small"}>{`${month.month}월`}</Text>
+                    </Flex>
+                    <Flex
+                      alignItems={"center"}
+                      justifyContent={"space-between"}
                       w={"max-content"}
+                      height={5}
                     >
-                      <Text fontSize={"small"}>2020-01-02</Text>
-                      <Text mx={3}>|</Text>
-                      <Text fontSize={"small"}>2020-01-31</Text>
+                      <Text fontSize={"small"}>{month.durationStart}</Text>
+                      <Box mb={1}>
+                        <Text mx={3}>⇢</Text>
+                      </Box>
+                      <Text fontSize={"small"}>{month.durationEnd}</Text>
                     </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
                       fontSize={"small"}
                     >
-                      <Text>0.71</Text>
+                      <Text>{month.inputManMonth}</Text>
                     </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
                       fontSize={"small"}
                     >
-                      <Text>2,129,032</Text>
+                      {month.monthSalary ? (
+                        <NumericFormat
+                          value={month.monthSalary}
+                          displayType="text"
+                          thousandSeparator={","}
+                          className="text-sm font-thin"
+                        />
+                      ) : (
+                        <NumericFormat
+                          value={salaryInputs[`${emp.id}-${month.id}`]}
+                          thousandSeparator={","}
+                          className="numeric-input h-4 rounded-md border border-inherit bg-inherit w-full text-center
+                        focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
+                          onChange={(event) =>
+                            handleSalary(event, emp.id, month.id)
+                          }
+                        />
+                      )}
+                    </Flex>
+
+                    <Flex
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
+                    >
+                      <NumericFormat
+                        value={month.inputPrice ? month.inputPrice : 0}
+                        displayType="text"
+                        thousandSeparator={","}
+                        className="text-sm font-thin"
+                      />
+                    </Flex>
+
+                    <Box my={0.5}></Box>
+
+                    <Flex
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
+                    >
+                      <NumericFormat
+                        onKeyUp={() => null}
+                        value={null}
+                        decimalScale={2}
+                        allowNegative={false}
+                        className="h-4 rounded-md border border-inherit bg-inherit w-full text-center
+                    focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
+                        onChange={() => null}
+                      />
                     </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
                       fontSize={"small"}
                     >
-                      <Text>0.40</Text>
+                      <Text>{convertLevelEnToKo(month.calculateLevel)}</Text>
                     </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
                       fontSize={"small"}
                     >
-                      <Text>중급</Text>
+                      <NumericFormat
+                        value={month.calculatePrice ? month.calculatePrice : 0}
+                        displayType="text"
+                        thousandSeparator={","}
+                        className="text-sm font-thin"
+                      />
                     </Flex>
                     <Flex
                       alignItems={"center"}
                       justifyContent={"center"}
                       fontSize={"small"}
                     >
-                      <Text>2,400,000</Text>
-                    </Flex>
-                    <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
-                    >
-                      <Text>270,968</Text>
+                      <NumericFormat
+                        value={month.plPrice ? month.plPrice : 0}
+                        displayType="text"
+                        thousandSeparator={","}
+                        className="text-sm font-thin"
+                      />
                     </Flex>
                   </Flex>
                 ))}
@@ -319,7 +467,7 @@ export default function ProjectStatisticsCurrentCondition() {
             </Flex>
           ))}
 
-        {data && data.ok && data.data.content.length === 0 && <NoContent />}
+        {data && data.ok && employeeHistory.length === 0 && <NoContent />}
       </Skeleton>
     </>
   );

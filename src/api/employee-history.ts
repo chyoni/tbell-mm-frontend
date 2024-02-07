@@ -25,7 +25,7 @@ export const addEmployeeHistory = (
 
 export const getEmployeeHistory = (
   contractNumber: string,
-  year?: string,
+  year: string = new Date().getFullYear().toString(),
   employeeName?: string
 ): Promise<IGetEmployeeHistories> =>
   instance
