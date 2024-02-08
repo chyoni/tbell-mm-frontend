@@ -497,13 +497,19 @@ export default function ProjectRegister() {
                               w={"100%"}
                               flexDirection={"column"}
                               border={"ButtonShadow"}
-                              borderStyle={"groove"}
-                              borderWidth={2}
+                              borderStyle={"outset"}
+                              borderWidth={1}
                               borderRadius={5}
                               borderColor={primaryColor}
                               p={2}
                             >
-                              <Flex justifyContent={"flex-end"}>
+                              <Flex
+                                justifyContent={"space-between"}
+                                alignItems={"center"}
+                              >
+                                <Text fontWeight={"bold"}>
+                                  {convertLevelEnToKo(keyValue[0])}
+                                </Text>
                                 <IconButton
                                   onClick={() =>
                                     clickRemoveUnitPrice(keyValue[0])
@@ -511,18 +517,17 @@ export default function ProjectRegister() {
                                   variant="ghost"
                                   colorScheme="teal"
                                   aria-label="delete"
-                                  fontSize="20px"
+                                  fontSize="15px"
                                   size={"sm"}
                                   icon={<IoCloseCircleSharp />}
                                 />
                               </Flex>
                               <Box>
-                                <Text>{convertLevelEnToKo(keyValue[0])}</Text>
                                 <NumericFormat
                                   value={keyValue[1]}
                                   displayType="text"
                                   thousandSeparator={","}
-                                  className="text-xl font-semibold"
+                                  className="text-xl font-thin"
                                 />
                               </Box>
                             </Flex>

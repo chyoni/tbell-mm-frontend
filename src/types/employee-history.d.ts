@@ -42,3 +42,8 @@ export interface IEmployeeHistory {
 export interface IGetEmployeeHistories extends IResponse {
   data: IGetData<IEmployeeHistory>;
 }
+
+export interface IAddHistoryManMonthPayload {
+  historyId: string;
+  payload: ManMonth[];
+}

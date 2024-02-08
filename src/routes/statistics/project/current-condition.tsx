@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -8,23 +8,27 @@ import {
   Input,
   Skeleton,
   Text,
-} from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
+} from "@chakra-ui/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  IAddHistoryManMonthPayload,
   IEmployeeHistory,
   IGetEmployeeHistories,
-} from '../../../types/employee-history';
-import { IErrorResponse } from '../../../types/common';
-import { getEmployeeHistory } from '../../../api/employee-history';
-import { Helmet } from 'react-helmet-async';
-import { primaryColor, titleColor } from '../../../theme';
-import { useNavigate, useParams } from 'react-router-dom';
-import { IGetProject } from '../../../types/project';
-import { getProject } from '../../../api/projects';
-import { FaArrowLeft } from 'react-icons/fa6';
-import NoContent from '../../../components/no-content';
-import { convertLevelEnToKo } from '../../../utils';
-import { NumericFormat } from 'react-number-format';
+} from "../../../types/employee-history";
+import { IErrorResponse } from "../../../types/common";
+import {
+  getEmployeeHistory,
+  saveHistoryManMonths,
+} from "../../../api/employee-history";
+import { Helmet } from "react-helmet-async";
+import { primaryColor, titleColor } from "../../../theme";
+import { useNavigate, useParams } from "react-router-dom";
+import { IGetProject } from "../../../types/project";
+import { getProject } from "../../../api/projects";
+import { FaArrowLeft } from "react-icons/fa6";
+import NoContent from "../../../components/no-content";
+import { convertLevelEnToKo } from "../../../utils";
+import { NumericFormat } from "react-number-format";
 
 function getCopyEmployeeHistoryStateAndIndex(
   employeeHistory: IEmployeeHistory[],
@@ -56,13 +60,13 @@ export default function ProjectStatisticsCurrentCondition() {
   const [searchYear, setSearchYear] = useState<string>(
     new Date().getFullYear().toString()
   );
-  const [searchEmployeeName, setSearchEmployeeName] = useState<string>('');
+  const [searchEmployeeName, setSearchEmployeeName] = useState<string>("");
 
   const { isLoading: projectLoading, data: projectData } = useQuery<
     IGetProject,
     IErrorResponse
   >({
-    queryKey: ['project'],
+    queryKey: ["project"],
     queryFn: () => getProject(contractNumber!),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
@@ -72,7 +76,7 @@ export default function ProjectStatisticsCurrentCondition() {
     IGetEmployeeHistories,
     IErrorResponse
   >({
-    queryKey: ['employeeHistory'],
+    queryKey: ["employeeHistory"],
     queryFn: () =>
       getEmployeeHistory(contractNumber!, searchYear, searchEmployeeName),
     enabled: contractNumber !== undefined,
@@ -82,14 +86,15 @@ export default function ProjectStatisticsCurrentCondition() {
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>
   ) => {
-    if (e.key === 'Enter') searchByCond();
+    if (e.key === "Enter") searchByCond();
   };
+
+  const [isAnyChanged, setIsAnyChanged] = useState<boolean>(false);
 
   const searchByCond = async () => {
     await refetch();
+    setIsAnyChanged(false);
   };
-
-  console.log(data, projectData);
 
   const [employeeHistory, setEmployeeHistory] = useState<IEmployeeHistory[]>(
     []
@@ -118,7 +123,7 @@ export default function ProjectStatisticsCurrentCondition() {
           */
 
           // 기존값을 지우는 방식
-          salaryInputValues[`${history.id}-${mm.id}`] = '';
+          salaryInputValues[`${history.id}-${mm.id}`] = "";
         });
       });
 
@@ -134,7 +139,7 @@ export default function ProjectStatisticsCurrentCondition() {
           */
 
           // 기존값을 지우는 방식
-          calculateInputValues[`cal-${history.id}-${mm.id}`] = '';
+          calculateInputValues[`cal-${history.id}-${mm.id}`] = "";
         });
       });
 
@@ -150,7 +155,7 @@ export default function ProjectStatisticsCurrentCondition() {
     manMonthId: number
   ) => {
     // 급여 입력 필드값
-    const salary = +event.target.value.replaceAll(',', '');
+    const salary = +event.target.value.replaceAll(",", "");
 
     const {
       updatedEmployeeHistory,
@@ -168,6 +173,15 @@ export default function ProjectStatisticsCurrentCondition() {
         indexToUpdateManMonth
       ].inputManMonth;
 
+    const plPrice =
+      updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
+        indexToUpdateManMonth
+      ].plPrice;
+    const calculatePrice =
+      updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
+        indexToUpdateManMonth
+      ].calculatePrice;
+
     // 변경할 mm 객체에 대해서 기존값은 그대로 두고 inputPrice의 값을 수정(추가)한다.
     updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
       indexToUpdateManMonth
@@ -177,13 +191,21 @@ export default function ProjectStatisticsCurrentCondition() {
       ],
       inputPrice: +(salary * inputManMonth).toFixed(0),
       monthSalary: salary,
+      ...(((plPrice && calculatePrice) || (!plPrice && calculatePrice)) && {
+        plPrice: +(
+          calculatePrice - +(salary * inputManMonth).toFixed(0)
+        ).toFixed(0),
+      }),
     };
     // 변경한 employeeHistory를 적용한다.
     setEmployeeHistory(updatedEmployeeHistory);
 
     const copySalaryInputs = salaryInputs;
-    copySalaryInputs[`${employeeHistoryId}-${manMonthId}`] = salary.toString();
+    copySalaryInputs[`${employeeHistoryId}-${manMonthId}`] =
+      salary.toString() === "0" ? "" : salary.toString();
     setSalaryInputs(copySalaryInputs);
+
+    setIsAnyChanged(true);
   };
 
   const handleCalculateManMonth = (
@@ -227,15 +249,35 @@ export default function ProjectStatisticsCurrentCondition() {
     setEmployeeHistory(updatedEmployeeHistory);
 
     const copyCalculateManMonthInputs = calculateManMonthInputs;
+
     copyCalculateManMonthInputs[`cal-${employeeHistoryId}-${manMonthId}`] =
       calculateManMonth.toString();
+
     setCalculateManMonthInputs(copyCalculateManMonthInputs);
+
+    setIsAnyChanged(true);
   };
 
-  const handleSave = (employeeId: number): void => {
+  const addHistoryManMonthsMutation = useMutation<
+    IGetEmployeeHistories,
+    IErrorResponse,
+    IAddHistoryManMonthPayload
+  >({
+    mutationFn: (variables: IAddHistoryManMonthPayload) =>
+      saveHistoryManMonths(variables.historyId, variables.payload),
+    onSuccess: () => {},
+    onError: (error) => {},
+  });
+
+  const handleSave = async (employeeId: number): Promise<void> => {
     const history = employeeHistory.find((h) => h.id === employeeId);
 
-    console.log(history);
+    if (history === null || history === undefined) return;
+
+    await addHistoryManMonthsMutation.mutate({
+      historyId: history.id.toString(),
+      payload: history.mms,
+    });
   };
 
   return (
@@ -243,27 +285,27 @@ export default function ProjectStatisticsCurrentCondition() {
       <Helmet>
         <title>{`투입 현황 ${contractNumber}`}</title>
       </Helmet>
-      <Skeleton isLoaded={!projectLoading && !isLoading} height={'50vh'}>
+      <Skeleton isLoaded={!projectLoading && !isLoading} height={"50vh"}>
         {/* 화면 상단 타이틀 */}
         <HStack marginBottom={5}>
           <Button
-            variant={'ghost'}
-            size={'sm'}
+            variant={"ghost"}
+            size={"sm"}
             colorScheme="teal"
             onClick={() => navigate(-1)}
           >
             <Icon as={FaArrowLeft} />
           </Button>
-          <Text fontWeight={'semibold'} fontSize={'2xl'}>
+          <Text fontWeight={"semibold"} fontSize={"2xl"}>
             {`[${projectData?.data.teamName}] 투입 현황`}
           </Text>
           <HStack>
             <Text
-              fontWeight={'hairline'}
+              fontWeight={"hairline"}
             >{`(${projectData?.data.startDate}`}</Text>
-            <Text fontWeight={'hairline'}>-</Text>
+            <Text fontWeight={"hairline"}>-</Text>
             <Text
-              fontWeight={'hairline'}
+              fontWeight={"hairline"}
             >{`${projectData?.data.endDate})`}</Text>
           </HStack>
         </HStack>
@@ -271,29 +313,31 @@ export default function ProjectStatisticsCurrentCondition() {
 
         {/* 화면 상단 단가*/}
         <HStack marginBottom={5}>
-          <Flex direction={'column'}>
-            <Text fontWeight={'hairline'}>단가</Text>
+          <Flex direction={"column"}>
+            <Text fontWeight={"hairline"}>단가</Text>
             <HStack marginTop={2}>
               {projectData?.data.unitPrices.map((up) => {
                 return Object.entries(up).map((keyValue, index) => (
                   <Flex
                     key={index}
-                    w={'100%'}
-                    flexDirection={'column'}
-                    border={'ButtonShadow'}
-                    borderStyle={'groove'}
-                    borderWidth={2}
+                    w={"100%"}
+                    flexDirection={"column"}
+                    border={"Highlight"}
+                    borderStyle={"outset"}
+                    borderWidth={1}
                     borderRadius={5}
                     borderColor={primaryColor}
                     p={2}
                   >
                     <Box>
-                      <Text>{convertLevelEnToKo(keyValue[0])}</Text>
+                      <Text fontWeight={"bold"}>
+                        {convertLevelEnToKo(keyValue[0])}
+                      </Text>
                       <NumericFormat
                         value={keyValue[1]}
                         displayType="text"
-                        thousandSeparator={','}
-                        className="text-xl font-semibold"
+                        thousandSeparator={","}
+                        className="text-xl font-thin"
                       />
                     </Box>
                   </Flex>
@@ -306,8 +350,8 @@ export default function ProjectStatisticsCurrentCondition() {
 
         {/* 검색 섹션 */}
         <HStack marginBottom={5} spacing={8}>
-          <Box width={'min-content'} alignItems={'center'} display={'flex'}>
-            <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
+          <Box width={"min-content"} alignItems={"center"} display={"flex"}>
+            <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
               연도 (투입일 기준)
             </Text>
             <Input
@@ -321,8 +365,8 @@ export default function ProjectStatisticsCurrentCondition() {
               onKeyUp={handleKeyUp}
             />
           </Box>
-          <Box width={'min-content'} alignItems={'center'} display={'flex'}>
-            <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
+          <Box width={"min-content"} alignItems={"center"} display={"flex"}>
+            <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
               사원명
             </Text>
             <Input
@@ -338,7 +382,7 @@ export default function ProjectStatisticsCurrentCondition() {
           </Box>
           <Button
             colorScheme="teal"
-            size={'sm'}
+            size={"sm"}
             onClick={searchByCond}
             onKeyUp={handleKeyUp}
           >
@@ -354,24 +398,26 @@ export default function ProjectStatisticsCurrentCondition() {
           employeeHistory.map((emp, index) => (
             <Flex
               key={index}
-              border={'ButtonShadow'}
+              border={"ButtonShadow"}
               borderColor={primaryColor}
-              borderStyle={'double'}
+              borderStyle={"double"}
               borderRadius={10}
             >
-              <HStack spacing={10} w={'30%'}>
+              <HStack spacing={5} w={"30%"}>
                 <Flex
-                  direction={'column'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                  w={'30%'}
+                  direction={"column"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  w={"30%"}
                   py={6}
                   px={2}
                 >
                   <Button
-                    fontSize={'small'}
-                    variant={'outline'}
-                    colorScheme={'teal'}
+                    fontSize={"small"}
+                    variant={"outline"}
+                    p={1}
+                    colorScheme={"teal"}
+                    isDisabled={!isAnyChanged}
                     onClick={() => handleSave(emp.id)}
                   >
                     변경사항 저장
@@ -379,124 +425,124 @@ export default function ProjectStatisticsCurrentCondition() {
                 </Flex>
 
                 <Flex
-                  direction={'column'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                  w={'30%'}
+                  direction={"column"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  w={"30%"}
                   py={6}
                   px={2}
                 >
-                  <Text fontSize={'small'} color={primaryColor}>
+                  <Text fontSize={"small"} color={primaryColor}>
                     사번
                   </Text>
-                  <Text fontSize={'small'}>{emp.employee.employeeNumber}</Text>
+                  <Text fontSize={"small"}>{emp.employee.employeeNumber}</Text>
                 </Flex>
 
                 <Flex
-                  direction={'column'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                  w={'30%'}
+                  direction={"column"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  w={"30%"}
                 >
-                  <Text fontSize={'small'} color={primaryColor}>
+                  <Text fontSize={"small"} color={primaryColor}>
                     이름
                   </Text>
-                  <Text fontSize={'small'}>{emp.employee.name}</Text>
+                  <Text fontSize={"small"}>{emp.employee.name}</Text>
                 </Flex>
 
-                <Box w={'60%'} px={2} py={6} mb={2}>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                <Box w={"60%"} px={2} py={6} mb={2}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       월 구분
                     </Text>
                   </Flex>
-                  <Flex h={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex h={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       실제 투입일
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       투입 MM
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       급여
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       투입 금액
                     </Text>
                   </Flex>
 
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       정산 MM
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       정산 등급
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       정산 금액
                     </Text>
                   </Flex>
-                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
-                    <Text color={titleColor} fontSize={'smaller'}>
+                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
+                    <Text color={titleColor} fontSize={"smaller"}>
                       손익액
                     </Text>
                   </Flex>
                 </Box>
               </HStack>
 
-              <HStack overflowX={'auto'} w={'70%'}>
+              <HStack overflowX={"auto"} w={"70%"}>
                 {emp.mms.map((month, index) => (
                   <Flex
                     key={index}
-                    direction={'column'}
+                    direction={"column"}
                     py={4}
                     px={2}
-                    borderStyle={'outset'}
+                    borderStyle={"outset"}
                     borderWidth={1}
-                    borderColor={'Background'}
+                    borderColor={"Background"}
                     mb={2}
-                    justifyContent={'flex-start'}
+                    justifyContent={"flex-start"}
                   >
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
                       height={5}
                     >
-                      <Text fontSize={'small'}>{`${month.month}월`}</Text>
+                      <Text fontSize={"small"}>{`${month.month}월`}</Text>
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'space-between'}
-                      w={'max-content'}
+                      alignItems={"center"}
+                      justifyContent={"space-between"}
+                      w={"max-content"}
                       height={5}
                     >
-                      <Text fontSize={'small'}>{month.durationStart}</Text>
+                      <Text fontSize={"small"}>{month.durationStart}</Text>
                       <Box mb={1}>
                         <Text mx={3}>⇢</Text>
                       </Box>
-                      <Text fontSize={'small'}>{month.durationEnd}</Text>
+                      <Text fontSize={"small"}>{month.durationEnd}</Text>
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <Text>{month.inputManMonth}</Text>
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <NumericFormat
                         value={
@@ -504,7 +550,8 @@ export default function ProjectStatisticsCurrentCondition() {
                             ? month.monthSalary
                             : salaryInputs[`${emp.id}-${month.id}`]
                         }
-                        thousandSeparator={','}
+                        allowNegative={false}
+                        thousandSeparator={","}
                         className="numeric-input h-4 rounded-md border border-inherit bg-inherit w-full text-center
                         focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
                         onChange={(event) =>
@@ -514,14 +561,14 @@ export default function ProjectStatisticsCurrentCondition() {
                     </Flex>
 
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <NumericFormat
                         value={month.inputPrice ? month.inputPrice : 0}
                         displayType="text"
-                        thousandSeparator={','}
+                        thousandSeparator={","}
                         className="text-sm font-thin"
                       />
                     </Flex>
@@ -529,16 +576,19 @@ export default function ProjectStatisticsCurrentCondition() {
                     <Box my={0.5}></Box>
 
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <NumericFormat
                         value={
-                          calculateManMonthInputs[`cal-${emp.id}-${month.id}`]
+                          month.calculateManMonth
+                            ? month.calculateManMonth
+                            : calculateManMonthInputs[
+                                `cal-${emp.id}-${month.id}`
+                              ]
                         }
                         decimalScale={2}
-                        allowNegative={false}
                         className="h-4 rounded-md border border-inherit bg-inherit w-full text-center
                     focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
                         onChange={(event) =>
@@ -547,35 +597,35 @@ export default function ProjectStatisticsCurrentCondition() {
                       />
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <Text>{convertLevelEnToKo(month.calculateLevel)}</Text>
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <NumericFormat
                         value={month.calculatePrice ? month.calculatePrice : 0}
                         displayType="text"
                         decimalScale={0}
-                        thousandSeparator={','}
+                        thousandSeparator={","}
                         className="text-sm font-thin"
                       />
                     </Flex>
                     <Flex
-                      alignItems={'center'}
-                      justifyContent={'center'}
-                      fontSize={'small'}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      fontSize={"small"}
                     >
                       <NumericFormat
                         value={month.plPrice ? month.plPrice : 0}
                         displayType="text"
                         decimalScale={0}
-                        thousandSeparator={','}
+                        thousandSeparator={","}
                         className="text-sm font-thin"
                       />
                     </Flex>

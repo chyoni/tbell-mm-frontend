@@ -1,6 +1,7 @@
 import {
   ICreateEmployeeHistoryRes,
   IGetEmployeeHistories,
+  ManMonth,
 } from "../types/employee-history";
 import { instance } from "./instance";
 
@@ -37,5 +38,15 @@ export const getEmployeeHistory = (
           employeeName !== undefined &&
           employeeName !== "" && { employeeName }),
       },
+    })
+    .then((res) => res.data);
+
+export const saveHistoryManMonths = (
+  historyId: string,
+  payload: ManMonth[]
+): Promise<IGetEmployeeHistories> =>
+  instance
+    .post(`history/${historyId}/mms`, [...payload], {
+      headers: { "Content-Type": "application/json" },
     })
     .then((res) => res.data);

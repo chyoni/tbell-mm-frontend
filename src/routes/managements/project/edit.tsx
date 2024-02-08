@@ -507,8 +507,8 @@ export default function ProjectEdit() {
                               w={"100%"}
                               flexDirection={"column"}
                               border={"ButtonShadow"}
-                              borderStyle={"groove"}
-                              borderWidth={2}
+                              borderStyle={"outset"}
+                              borderWidth={1}
                               borderRadius={5}
                               borderColor={primaryColor}
                               p={2}
@@ -517,7 +517,9 @@ export default function ProjectEdit() {
                                 justifyContent={"space-between"}
                                 alignItems={"center"}
                               >
-                                <Text>{convertLevelEnToKo(keyValue[0])}</Text>
+                                <Text fontWeight={"bold"}>
+                                  {convertLevelEnToKo(keyValue[0])}
+                                </Text>
                                 <IconButton
                                   onClick={() =>
                                     clickRemoveUnitPrice(keyValue[0])
@@ -525,7 +527,7 @@ export default function ProjectEdit() {
                                   variant="ghost"
                                   colorScheme="teal"
                                   aria-label="delete"
-                                  fontSize="20px"
+                                  fontSize="15px"
                                   size={"sm"}
                                   icon={<IoCloseCircleSharp />}
                                 />
@@ -535,7 +537,7 @@ export default function ProjectEdit() {
                                   value={keyValue[1]}
                                   displayType="text"
                                   thousandSeparator={","}
-                                  className="text-xl font-semibold"
+                                  className="text-xl font-thin"
                                 />
                               </Box>
                             </Flex>

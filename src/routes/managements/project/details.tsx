@@ -182,19 +182,21 @@ export default function ProjectDetails() {
                                 w={"100%"}
                                 flexDirection={"column"}
                                 border={"ButtonShadow"}
-                                borderStyle={"groove"}
-                                borderWidth={2}
+                                borderStyle={"outset"}
+                                borderWidth={1}
                                 borderRadius={5}
                                 borderColor={primaryColor}
                                 p={2}
                               >
                                 <Box>
-                                  <Text>{convertLevelEnToKo(keyValue[0])}</Text>
+                                  <Text fontWeight={"bold"}>
+                                    {convertLevelEnToKo(keyValue[0])}
+                                  </Text>
                                   <NumericFormat
                                     value={keyValue[1]}
                                     displayType="text"
                                     thousandSeparator={","}
-                                    className="text-xl font-semibold"
+                                    className="text-xl font-thin"
                                   />
                                 </Box>
                               </Flex>
