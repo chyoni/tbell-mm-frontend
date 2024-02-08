@@ -8,6 +8,7 @@ import {
   Input,
   Skeleton,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -55,6 +56,7 @@ function getCopyEmployeeHistoryStateAndIndex(
 }
 
 export default function ProjectStatisticsCurrentCondition() {
+  const toast = useToast();
   const { contractNumber } = useParams();
   const navigate = useNavigate();
   const [searchYear, setSearchYear] = useState<string>(
@@ -265,8 +267,24 @@ export default function ProjectStatisticsCurrentCondition() {
   >({
     mutationFn: (variables: IAddHistoryManMonthPayload) =>
       saveHistoryManMonths(variables.historyId, variables.payload),
-    onSuccess: () => {},
-    onError: (error) => {},
+    onSuccess: () => {
+      toast({
+        title: `등록 완료`,
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `등록 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
   });
 
   const handleSave = async (employeeId: number): Promise<void> => {
@@ -402,6 +420,7 @@ export default function ProjectStatisticsCurrentCondition() {
               borderColor={primaryColor}
               borderStyle={"double"}
               borderRadius={10}
+              marginBottom={4}
             >
               <HStack spacing={5} w={"30%"}>
                 <Flex
