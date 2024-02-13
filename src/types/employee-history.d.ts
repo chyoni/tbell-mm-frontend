@@ -34,6 +34,7 @@ export interface IEmployeeHistory {
   employee: IEmployee;
   project: IProjectNotPrices;
   startDate: string;
+  endDate?: string;
   level: string;
   worth: number;
   mms: ManMonth[];
@@ -46,4 +47,23 @@ export interface IGetEmployeeHistories extends IResponse {
 export interface IAddHistoryManMonthPayload {
   historyId: string;
   payload: ManMonth[];
+}
+
+export interface ICompleteHistoryPayload {
+  historyId: string;
+  endDate: string;
+}
+
+export interface ICompleteHistoryRes extends IResponse {
+  data: {
+    id: number;
+    employee: {
+      employeeNumber: string;
+      name: string;
+      startDate: string;
+      endDate?: string;
+    };
+    startDate: string;
+    endDate: string;
+  };
 }

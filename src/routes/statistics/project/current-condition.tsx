@@ -3,21 +3,35 @@ import {
   Box,
   Button,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   HStack,
   Icon,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Skeleton,
   Text,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   IAddHistoryManMonthPayload,
+  ICompleteHistoryPayload,
+  ICompleteHistoryRes,
   IEmployeeHistory,
   IGetEmployeeHistories,
 } from "../../../types/employee-history";
 import { IErrorResponse } from "../../../types/common";
 import {
+  completeHistory,
   getEmployeeHistory,
   saveHistoryManMonths,
 } from "../../../api/employee-history";
@@ -30,6 +44,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import NoContent from "../../../components/no-content";
 import { convertLevelEnToKo } from "../../../utils";
 import { NumericFormat } from "react-number-format";
+import Pagination from "../../../components/pagination";
 
 function getCopyEmployeeHistoryStateAndIndex(
   employeeHistory: IEmployeeHistory[],
@@ -64,6 +79,18 @@ export default function ProjectStatisticsCurrentCondition() {
   );
   const [searchEmployeeName, setSearchEmployeeName] = useState<string>("");
 
+  const [page, setPage] = useState<number>(0);
+  // 첫번째 페이지 Function
+  const goToFirstPage = () => setPage(0);
+  // 이전 페이지 Function
+  const goToPrevPage = () => setPage((page) => page - 1);
+  // 다음 페이지 Function
+  const goToNextPage = () => setPage((page) => page + 1);
+  // 마지막 페이지 Function
+  const goToLastPage = (lastPage: number) => setPage(lastPage);
+  // 특정 페이지 지정 Function
+  const goToSpecificPage = (page: number) => setPage(page);
+
   const { isLoading: projectLoading, data: projectData } = useQuery<
     IGetProject,
     IErrorResponse
@@ -91,11 +118,8 @@ export default function ProjectStatisticsCurrentCondition() {
     if (e.key === "Enter") searchByCond();
   };
 
-  const [isAnyChanged, setIsAnyChanged] = useState<boolean>(false);
-
   const searchByCond = async () => {
     await refetch();
-    setIsAnyChanged(false);
   };
 
   const [employeeHistory, setEmployeeHistory] = useState<IEmployeeHistory[]>(
@@ -184,6 +208,12 @@ export default function ProjectStatisticsCurrentCondition() {
         indexToUpdateManMonth
       ].calculatePrice;
 
+    console.log(
+      (plPrice && calculatePrice) ||
+        (!plPrice && calculatePrice) ||
+        (plPrice && !calculatePrice)
+    );
+
     // 변경할 mm 객체에 대해서 기존값은 그대로 두고 inputPrice의 값을 수정(추가)한다.
     updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
       indexToUpdateManMonth
@@ -193,10 +223,12 @@ export default function ProjectStatisticsCurrentCondition() {
       ],
       inputPrice: +(salary * inputManMonth).toFixed(0),
       monthSalary: salary,
-      ...(((plPrice && calculatePrice) || (!plPrice && calculatePrice)) && {
-        plPrice: +(
-          calculatePrice - +(salary * inputManMonth).toFixed(0)
-        ).toFixed(0),
+      ...(((plPrice && calculatePrice) ||
+        (plPrice && !calculatePrice) ||
+        (!plPrice && calculatePrice)) && {
+        plPrice: calculatePrice
+          ? +(calculatePrice - +(salary * inputManMonth).toFixed(0)).toFixed(0)
+          : 0,
       }),
     };
     // 변경한 employeeHistory를 적용한다.
@@ -206,8 +238,6 @@ export default function ProjectStatisticsCurrentCondition() {
     copySalaryInputs[`${employeeHistoryId}-${manMonthId}`] =
       salary.toString() === "0" ? "" : salary.toString();
     setSalaryInputs(copySalaryInputs);
-
-    setIsAnyChanged(true);
   };
 
   const handleCalculateManMonth = (
@@ -256,8 +286,6 @@ export default function ProjectStatisticsCurrentCondition() {
       calculateManMonth.toString();
 
     setCalculateManMonthInputs(copyCalculateManMonthInputs);
-
-    setIsAnyChanged(true);
   };
 
   const addHistoryManMonthsMutation = useMutation<
@@ -287,17 +315,117 @@ export default function ProjectStatisticsCurrentCondition() {
     },
   });
 
+  const completeHistoryMutation = useMutation<
+    ICompleteHistoryRes,
+    IErrorResponse,
+    ICompleteHistoryPayload
+  >({
+    mutationFn: (variables: ICompleteHistoryPayload) =>
+      completeHistory(variables.historyId, variables.endDate),
+    onSuccess: () => {
+      toast({
+        title: `등록 완료`,
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+      if (isEndDateModalOpen) onEndDateToggle();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `투입종료일 지정 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const handleCompleteHistory = () => {
+    if (
+      makeEndDate === "" ||
+      makeEndDate === null ||
+      makeEndDate === undefined
+    ) {
+      toast({
+        title: `투입종료일 지정이 되지 않았습니다.`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (
+      selectedMakeEndDateHistory === undefined ||
+      selectedMakeEndDateHistory === null
+    )
+      return;
+    completeHistoryMutation.mutate({
+      historyId: selectedMakeEndDateHistory.id.toString(),
+      endDate: makeEndDate,
+    });
+  };
+
   const handleSave = async (employeeId: number): Promise<void> => {
     const history = employeeHistory.find((h) => h.id === employeeId);
 
     if (history === null || history === undefined) return;
 
-    await addHistoryManMonthsMutation.mutate({
+    const payload = history.mms.filter((mm) => {
+      if (mm.calculateLevel === null || mm.calculateLevel === undefined)
+        return false;
+      if (mm.calculateManMonth === null || mm.calculateManMonth === undefined)
+        return false;
+      if (mm.calculatePrice === null || mm.calculatePrice === undefined)
+        return false;
+      if (
+        mm.inputPrice === null ||
+        mm.inputPrice === undefined ||
+        mm.inputPrice === 0
+      )
+        return false;
+      if (
+        mm.monthSalary === null ||
+        mm.monthSalary === undefined ||
+        mm.monthSalary === 0
+      )
+        return false;
+      if (mm.plPrice === null || mm.plPrice === undefined) return false;
+
+      return true;
+    });
+
+    addHistoryManMonthsMutation.mutate({
       historyId: history.id.toString(),
-      payload: history.mms,
+      payload,
     });
   };
 
+  const [selectedMakeEndDateHistory, setSelectedMakeEndDateHistory] =
+    useState<IEmployeeHistory>();
+
+  const {
+    onToggle: onEndDateToggle,
+    isOpen: isEndDateModalOpen,
+    onClose: onEndDateModalClose,
+  } = useDisclosure();
+
+  const handlePopupPreSet = (emp: IEmployeeHistory) => {
+    setSelectedMakeEndDateHistory(emp);
+
+    setMakeEndDate(emp.endDate ? emp.endDate : "");
+
+    onEndDateToggle();
+  };
+  const [makeEndDate, setMakeEndDate] = useState<string>("");
+  const isMakeEndDateError = makeEndDate === undefined || makeEndDate === "";
+
+  const handleMakeEndDate = (e: ChangeEvent<HTMLInputElement>) => {
+    setMakeEndDate(e.target.value);
+  };
   return (
     <>
       <Helmet>
@@ -409,6 +537,19 @@ export default function ProjectStatisticsCurrentCondition() {
         </HStack>
         {/* 검색 섹션 끝 */}
 
+        {/* 페이징 버튼 */}
+        <Pagination
+          totalPages={data ? data.data.totalPages : 1}
+          page={page}
+          goToFirstPage={goToFirstPage}
+          goToLastPage={goToLastPage}
+          goToPrevPage={goToPrevPage}
+          goToNextPage={goToNextPage}
+          goToSpecificPage={goToSpecificPage}
+        />
+        <Box mb={5}></Box>
+        {/* 페이징 버튼 끝 */}
+
         {/* 화면 중단 리스트 */}
         {data &&
           data.ok &&
@@ -436,11 +577,82 @@ export default function ProjectStatisticsCurrentCondition() {
                     variant={"outline"}
                     p={1}
                     colorScheme={"teal"}
-                    isDisabled={!isAnyChanged}
                     onClick={() => handleSave(emp.id)}
                   >
                     변경사항 저장
                   </Button>
+                  <Button
+                    fontSize={"small"}
+                    marginTop={2}
+                    variant={"outline"}
+                    p={1}
+                    colorScheme={"red"}
+                    onClick={() => {
+                      handlePopupPreSet(emp);
+                    }}
+                  >
+                    투입종료일 지정
+                  </Button>
+                  <Modal
+                    isOpen={isEndDateModalOpen}
+                    onClose={onEndDateModalClose}
+                    size={"xl"}
+                  >
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>투입종료일 지정</ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        
+                        <Flex direction={"column"}>
+                          <Text fontWeight={"hairline"} fontSize={"x-large"}>
+                            {`${selectedMakeEndDateHistory?.employee.name}(${selectedMakeEndDateHistory?.employee.employeeNumber})`}
+                          </Text>
+                          <FormControl
+                            marginTop={8}
+                            marginRight={5}
+                            isRequired
+                            isInvalid={isMakeEndDateError}
+                          >
+                            <FormLabel>투입종료일</FormLabel>
+                            <Input
+                              size="md"
+                              type="date"
+                              value={
+                                selectedMakeEndDateHistory?.endDate
+                                  ? selectedMakeEndDateHistory.endDate
+                                  : makeEndDate
+                              }
+                              focusBorderColor={primaryColor}
+                              onChange={handleMakeEndDate}
+                            />
+                            {isMakeEndDateError && (
+                              <FormErrorMessage>
+                                필수 필드입니다.
+                              </FormErrorMessage>
+                            )}
+                          </FormControl>
+                        </Flex>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          variant={"outline"}
+                          mr={3}
+                          onClick={onEndDateModalClose}
+                        >
+                          취소
+                        </Button>
+                        <Button
+                          colorScheme="teal"
+                          onClick={handleCompleteHistory}
+                          isDisabled={completeHistoryMutation.isPending}
+                          isLoading={completeHistoryMutation.isPending}
+                        >
+                          저장
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
                 </Flex>
 
                 <Flex
@@ -655,6 +867,17 @@ export default function ProjectStatisticsCurrentCondition() {
           ))}
 
         {data && data.ok && employeeHistory.length === 0 && <NoContent />}
+
+        <Pagination
+          totalPages={data ? data.data.totalPages : 1}
+          page={page}
+          goToFirstPage={goToFirstPage}
+          goToLastPage={goToLastPage}
+          goToPrevPage={goToPrevPage}
+          goToNextPage={goToNextPage}
+          goToSpecificPage={goToSpecificPage}
+        />
+        <Box height={"20px"}></Box>
       </Skeleton>
     </>
   );

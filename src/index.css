@@ -4,9 +4,6 @@
     scrollbar-width: thin;
   }
 
-@tailwind components;
-@tailwind utilities;
-
 /* width */
 ::-webkit-scrollbar {
     width: 3px;
@@ -23,6 +20,7 @@
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: #0ED3AC;
+    background-color: #0ED3AC;
     border-radius: 50px;
     width: 1px;
     height: 2px;
@@ -30,5 +28,9 @@
  
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
+    background-color: #0ED3AC;
     background: #0ED3AC;
 }
+
+@tailwind components;
+@tailwind utilities;

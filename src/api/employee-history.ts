@@ -1,4 +1,6 @@
 import {
+  ICompleteHistoryPayload,
+  ICompleteHistoryRes,
   ICreateEmployeeHistoryRes,
   IGetEmployeeHistories,
   ManMonth,
@@ -49,4 +51,18 @@ export const saveHistoryManMonths = (
     .post(`history/${historyId}/mms`, [...payload], {
       headers: { "Content-Type": "application/json" },
     })
+    .then((res) => res.data);
+
+export const completeHistory = (
+  historyId: string,
+  endDate: String
+): Promise<ICompleteHistoryRes> =>
+  instance
+    .post(
+      `history/${historyId}`,
+      { endDate },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    )
     .then((res) => res.data);
