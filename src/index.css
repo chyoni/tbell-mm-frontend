@@ -1,7 +1,9 @@
 @tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
-    scrollbar-width: thin;
+    scrollbar-width: 50px;
   }
 
 /* width */
@@ -31,6 +33,3 @@
     background-color: #0ED3AC;
     background: #0ED3AC;
 }
-
-@tailwind components;
-@tailwind utilities;

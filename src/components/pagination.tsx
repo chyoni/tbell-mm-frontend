@@ -45,6 +45,8 @@ export default function Pagination({
   // total < 10 ? 0 : total % 10 === 0 ? total / 10 : Math.floor(total / 10 + 1);
   const toast = useToast();
 
+  console.log(page, lastPage);
+
   const handleNavigatePage = (valueAsString: string) => {
     if (valueAsString === "") return;
     if (lastPage < +valueAsString) {
@@ -141,7 +143,7 @@ export default function Pagination({
       <HStack>
         <IconButton
           size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
-          isDisabled={page + 1 === lastPage}
+          isDisabled={lastPage === 0 || page + 1 === lastPage}
           onClick={goToNextPage}
           aria-label={"Next Page"}
           colorScheme="teal"
@@ -149,7 +151,7 @@ export default function Pagination({
         />
         <IconButton
           size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
-          isDisabled={page + 1 === lastPage}
+          isDisabled={lastPage === 0 || page + 1 === lastPage}
           onClick={() => goToLastPage(lastPage - 1)}
           aria-label={"Last Page"}
           colorScheme="teal"

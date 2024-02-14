@@ -1,5 +1,4 @@
 import {
-  ICompleteHistoryPayload,
   ICompleteHistoryRes,
   ICreateEmployeeHistoryRes,
   IGetEmployeeHistories,

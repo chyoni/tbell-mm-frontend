@@ -535,42 +535,6 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
-* {
-  scrollbar-width: thin;
-}
-
-/* width */
-
-::-webkit-scrollbar {
-  width: 3px;
-  height: 4px;
-  scrollbar-width: thin;
-}
-
-/* Track */
-
-::-webkit-scrollbar-track {
-  background: #edeaea;
-  border-radius: 50px;
-}
-
-/* Handle */
-
-::-webkit-scrollbar-thumb {
-  background: #0ED3AC;
-  background-color: #0ED3AC;
-  border-radius: 50px;
-  width: 1px;
-  height: 2px;
-}
-
-/* Handle on hover */
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #0ED3AC;
-  background: #0ED3AC;
-}
-
 .pointer-events-none {
   pointer-events: none;
 }
@@ -701,6 +665,42 @@ video {
 
 .duration-75 {
   transition-duration: 75ms;
+}
+
+* {
+  scrollbar-width: 50px;
+}
+
+/* width */
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 4px;
+  scrollbar-width: thin;
+}
+
+/* Track */
+
+::-webkit-scrollbar-track {
+  background: #edeaea;
+  border-radius: 50px;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+  background: #0ED3AC;
+  background-color: #0ED3AC;
+  border-radius: 50px;
+  width: 1px;
+  height: 2px;
+}
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #0ED3AC;
+  background: #0ED3AC;
 }
 
 .hover\:bg-teal-600:hover {

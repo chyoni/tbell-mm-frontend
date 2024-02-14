@@ -870,18 +870,24 @@ export default function ProjectStatisticsCurrentCondition() {
             </Flex>
           ))}
 
+        {/* 정상 응답을 받았지만 데이터가 없는 경우 */}
         {data && data.ok && employeeHistory.length === 0 && <NoContent />}
+        {/* 정상 응답을 받았지만 데이터가 없는 경우 끝 */}
 
-        <Pagination
-          totalPages={data ? data.data.totalPages : 1}
-          page={page}
-          goToFirstPage={goToFirstPage}
-          goToLastPage={goToLastPage}
-          goToPrevPage={goToPrevPage}
-          goToNextPage={goToNextPage}
-          goToSpecificPage={goToSpecificPage}
-        />
+        {/* 하단 페이징 버튼 */}
+        {data?.data.totalPages !== 0 && (
+          <Pagination
+            totalPages={data ? data.data.totalPages : 1}
+            page={page}
+            goToFirstPage={goToFirstPage}
+            goToLastPage={goToLastPage}
+            goToPrevPage={goToPrevPage}
+            goToNextPage={goToNextPage}
+            goToSpecificPage={goToSpecificPage}
+          />
+        )}
         <Box height={"20px"}></Box>
+        {/* 하단 페이징 버튼 끝 */}
       </Skeleton>
     </>
   );
