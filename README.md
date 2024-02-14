@@ -10,6 +10,10 @@ In the project directory, you can run:
 
 Tailwind CSS file generated.
 
+### `npm run serve &`
+
+Application start on background process
+
 ### `npm start`
 
 Runs the app in the development mode.\
