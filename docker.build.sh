@@ -6,4 +6,4 @@ docker rm -f tbell-mm-frontend
 
 docker build -t tbell-mm-frontend .
 
-docker run -dp 3000:3000 --name tbell-mm-frontend -v "$(pwd)"/build:/app tbell-mm-frontend:latest
+docker run -dp 3000:3000 --name tbell-mm-frontend -v "$(pwd)"/build:/app/build tbell-mm-frontend:latest
