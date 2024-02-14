@@ -45,8 +45,6 @@ export default function Pagination({
   // total < 10 ? 0 : total % 10 === 0 ? total / 10 : Math.floor(total / 10 + 1);
   const toast = useToast();
 
-  console.log(page, lastPage);
-
   const handleNavigatePage = (valueAsString: string) => {
     if (valueAsString === "") return;
     if (lastPage < +valueAsString) {
