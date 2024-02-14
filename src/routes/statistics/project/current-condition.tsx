@@ -5,6 +5,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   HStack,
   Icon,
@@ -626,6 +627,9 @@ export default function ProjectStatisticsCurrentCondition() {
                               focusBorderColor={primaryColor}
                               onChange={handleMakeEndDate}
                             />
+                            <FormHelperText>
+                              (저장 버튼 클릭 시 바로 적용)
+                            </FormHelperText>
                             {isMakeEndDateError && (
                               <FormErrorMessage>
                                 필수 필드입니다.
