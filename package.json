@@ -1,6 +1,7 @@
 {
   "name": "mm-frontend",
   "version": "0.1.0",
+  "homepage": "http://localhost:3000/mms",
   "private": true,
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
