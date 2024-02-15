@@ -11,15 +11,15 @@ import {
   Input,
   Skeleton,
   VStack,
-} from "@chakra-ui/react";
-import { useMutation } from "@tanstack/react-query";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
-import { ICRUDDepartmentRes } from "../../../types/department";
-import { IErrorResponse } from "../../../types/common";
-import { editDepartment } from "../../../api/departments";
-import { primaryColor } from "../../../theme";
+} from '@chakra-ui/react';
+import { useMutation } from '@tanstack/react-query';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ICRUDDepartmentRes } from '../../../types/department';
+import { IErrorResponse } from '../../../types/common';
+import { editDepartment } from '../../../api/departments';
+import { primaryColor } from '../../../theme';
 
 export default function DepartmentEdit() {
   const { departmentName } = useParams();
@@ -40,9 +40,9 @@ export default function DepartmentEdit() {
 
   const onEdit = () => {
     if (
-      departmentName === "" ||
+      departmentName === '' ||
       departmentName === undefined ||
-      updateDepartmentName === "" ||
+      updateDepartmentName === '' ||
       updateDepartmentName === undefined
     )
       return;
@@ -54,7 +54,7 @@ export default function DepartmentEdit() {
     onSuccess: () => {
       toast({
         title: `수정 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -64,7 +64,7 @@ export default function DepartmentEdit() {
       toast({
         title: `수정 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -72,28 +72,28 @@ export default function DepartmentEdit() {
   });
 
   const isDepartmentNameError =
-    updateDepartmentName === undefined || updateDepartmentName === "";
+    updateDepartmentName === undefined || updateDepartmentName === '';
   return (
     <>
       <Helmet>
         <title>{`부서 수정 - ${departmentName}`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          부서 수정
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
+          부서 수정
         </Text>
       </Box>
-      <HStack justifyContent={"space-between"}>
+      <HStack justifyContent={'space-between'}>
         <Button
-          variant={"ghost"}
-          size={"sm"}
+          variant={'ghost'}
+          size={'sm'}
           colorScheme="teal"
           onClick={() => navigate(-1)}
         >
           이전으로
         </Button>
         <Button
-          size={"sm"}
+          size={'sm'}
           colorScheme="teal"
           onClick={onEdit}
           isLoading={editMutation.isPending}
@@ -106,12 +106,12 @@ export default function DepartmentEdit() {
         isLoaded={
           departmentName !== undefined && updateDepartmentName !== undefined
         }
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
       >
         <HStack marginTop={10}>
-          <Flex w={"100%"}>
-            <Box flex={1} w={"50%"} h={"100%"}>
+          <Flex w={'100%'}>
+            <Box flex={1} w={'50%'} h={'100%'}>
               <VStack p={2}>
                 <FormControl
                   marginTop={2}

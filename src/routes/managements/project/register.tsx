@@ -16,25 +16,25 @@ import {
   Grid,
   IconButton,
   useToast,
-} from "@chakra-ui/react";
-import React, { ChangeEvent, useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { NumericFormat } from "react-number-format";
-import Select, { ActionMeta, SingleValue } from "react-select";
-import { IoCloseCircleSharp } from "react-icons/io5";
-import { primaryColor } from "../../../theme";
-import { unitPriceLv, convertLevelEnToKo } from "../../../utils";
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { IGetDepartments } from "../../../types/department";
-import { getDepartments } from "../../../api/departments";
-import { IErrorResponse, Option } from "../../../types/common";
+} from '@chakra-ui/react';
+import React, { ChangeEvent, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { NumericFormat } from 'react-number-format';
+import Select, { ActionMeta, SingleValue } from 'react-select';
+import { IoCloseCircleSharp } from 'react-icons/io5';
+import { primaryColor } from '../../../theme';
+import { unitPriceLv, convertLevelEnToKo } from '../../../utils';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { IGetDepartments } from '../../../types/department';
+import { getDepartments } from '../../../api/departments';
+import { IErrorResponse, Option } from '../../../types/common';
 import {
   ICreateProjectPayload,
   ICUDProjectResponse,
   IUnitPrice,
-} from "../../../types/project";
-import { createProject } from "../../../api/projects";
+} from '../../../types/project';
+import { createProject } from '../../../api/projects';
 
 export default function ProjectRegister() {
   const navigate = useNavigate();
@@ -44,40 +44,40 @@ export default function ProjectRegister() {
     IGetDepartments,
     Error
   >({
-    queryKey: ["departments"],
+    queryKey: ['departments'],
     queryFn: () => getDepartments(),
   });
 
-  const [pStatus, setPStatus] = useState<"YEAR" | "SINGLE">("YEAR");
-  const handleProjectStatus = (value: "YEAR" | "SINGLE") => setPStatus(value);
+  const [pStatus, setPStatus] = useState<'YEAR' | 'SINGLE'>('YEAR');
+  const handleProjectStatus = (value: 'YEAR' | 'SINGLE') => setPStatus(value);
 
-  const [operationRate, setOperationRate] = useState<"INCLUDE" | "EXCEPT">(
-    "INCLUDE"
+  const [operationRate, setOperationRate] = useState<'INCLUDE' | 'EXCEPT'>(
+    'INCLUDE'
   );
-  const handleOperationRate = (value: "INCLUDE" | "EXCEPT") =>
+  const handleOperationRate = (value: 'INCLUDE' | 'EXCEPT') =>
     setOperationRate(value);
 
-  const [startDate, setStartDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>('');
   const handleStartDate = (event: ChangeEvent<HTMLInputElement>) =>
     setStartDate(event.target.value);
 
-  const [endDate, setEndDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>('');
   const handleEndDate = (event: ChangeEvent<HTMLInputElement>) =>
     setEndDate(event.target.value);
 
-  const [contractNumber, setContractNumber] = useState<string>("");
+  const [contractNumber, setContractNumber] = useState<string>('');
   const handleContractNumber = (e: ChangeEvent<HTMLInputElement>) =>
     setContractNumber(e.target.value);
 
-  const [contractor, setContractor] = useState<string>("");
+  const [contractor, setContractor] = useState<string>('');
   const handleContractor = (e: ChangeEvent<HTMLInputElement>) =>
     setContractor(e.target.value);
 
-  const [teamName, setTeamName] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>('');
   const handleTeamName = (e: ChangeEvent<HTMLInputElement>) =>
     setTeamName(e.target.value);
 
-  const [department, setDepartment] = useState<string>("STE 1실");
+  const [department, setDepartment] = useState<string>('STE 1실');
   const handleDepartments = (e: ChangeEvent<HTMLSelectElement>) =>
     setDepartment(e.target.value);
 
@@ -87,7 +87,7 @@ export default function ProjectRegister() {
     actionMeta: ActionMeta<Option>
   ) => setSelectedLevel(newValue);
 
-  const [selectedUnitPrice, setSelectedUnitPrice] = useState<string>("");
+  const [selectedUnitPrice, setSelectedUnitPrice] = useState<string>('');
   const onSelectedUnitPriceChange = (e: ChangeEvent<HTMLInputElement>) =>
     setSelectedUnitPrice(e.target.value);
 
@@ -102,7 +102,7 @@ export default function ProjectRegister() {
   const keyUpPrice = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === "Enter") onAddUnitPrice();
+    if (e.key === 'Enter') onAddUnitPrice();
   };
 
   const onAddUnitPrice = () => {
@@ -113,14 +113,14 @@ export default function ProjectRegister() {
     ) {
       toast({
         title: `등급 또는 단가를 입력하세요.`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
       return;
     }
 
-    const cleanPrice = selectedUnitPrice.replaceAll(",", "");
+    const cleanPrice = selectedUnitPrice.replaceAll(',', '');
     const clean = selectedLevel.value;
 
     const newUnitPrice = {
@@ -138,7 +138,7 @@ export default function ProjectRegister() {
     }
 
     setUnitPrices(copiedUnitPrices);
-    setSelectedUnitPrice("");
+    setSelectedUnitPrice('');
   };
 
   const onRegister = () => {
@@ -186,12 +186,12 @@ export default function ProjectRegister() {
     onSuccess(data, variables, context) {
       toast({
         title: `등록 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
       setTimeout(() => {
-        navigate("/projects");
+        navigate('/mms/projects');
       }, 1500);
     },
     onError: (error) => {
@@ -199,7 +199,7 @@ export default function ProjectRegister() {
       toast({
         title: `등록 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -207,12 +207,12 @@ export default function ProjectRegister() {
   });
 
   const isContractNumberError =
-    contractNumber === undefined || contractNumber === "";
-  const isContractorError = contractor === undefined || contractor === "";
-  const isDepartmentError = department === undefined || department === "";
-  const isTeamNameError = teamName === undefined || teamName === "";
-  const isStartDateError = startDate === undefined || startDate === "";
-  const isEndDateError = endDate === undefined || endDate === "";
+    contractNumber === undefined || contractNumber === '';
+  const isContractorError = contractor === undefined || contractor === '';
+  const isDepartmentError = department === undefined || department === '';
+  const isTeamNameError = teamName === undefined || teamName === '';
+  const isStartDateError = startDate === undefined || startDate === '';
+  const isEndDateError = endDate === undefined || endDate === '';
   const isConfiguredUnitPriceError = unitPrices.length === 0;
 
   return (
@@ -221,21 +221,21 @@ export default function ProjectRegister() {
         <title>{`프로젝트 등록`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
           프로젝트 등록
         </Text>
       </Box>
-      <HStack justifyContent={"space-between"}>
+      <HStack justifyContent={'space-between'}>
         <Button
-          variant={"ghost"}
-          size={"sm"}
+          variant={'ghost'}
+          size={'sm'}
           colorScheme="teal"
           onClick={() => navigate(-1)}
         >
           이전으로
         </Button>
         <Button
-          size={"sm"}
+          size={'sm'}
           colorScheme="teal"
           onClick={onRegister}
           isLoading={registerMutation.isPending}
@@ -254,13 +254,13 @@ export default function ProjectRegister() {
       </HStack>
       <Skeleton
         isLoaded={!departmentsLoading}
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
       >
         {departments && departments.ok && (
           <HStack marginTop={10}>
-            <Flex w={"100%"}>
-              <Box flex={1} w={"50%"} h={"100%"}>
+            <Flex w={'100%'}>
+              <Box flex={1} w={'50%'} h={'100%'}>
                 <VStack p={2}>
                   <FormControl
                     marginTop={2}
@@ -305,7 +305,7 @@ export default function ProjectRegister() {
                   >
                     <FormLabel>부서</FormLabel>
                     <ChakraSelect
-                      variant={"flushed"}
+                      variant={'flushed'}
                       focusBorderColor={primaryColor}
                       onChange={handleDepartments}
                       value={department}
@@ -344,11 +344,11 @@ export default function ProjectRegister() {
                     <RadioGroup
                       value={pStatus}
                       onChange={handleProjectStatus}
-                      colorScheme={"teal"}
+                      colorScheme={'teal'}
                     >
                       <HStack>
-                        <Radio value={"YEAR"}>연간</Radio>
-                        <Radio value={"SINGLE"}>단건</Radio>
+                        <Radio value={'YEAR'}>연간</Radio>
+                        <Radio value={'SINGLE'}>단건</Radio>
                       </HStack>
                     </RadioGroup>
                   </FormControl>
@@ -358,19 +358,19 @@ export default function ProjectRegister() {
                     <RadioGroup
                       value={operationRate}
                       onChange={handleOperationRate}
-                      colorScheme={"teal"}
+                      colorScheme={'teal'}
                     >
                       <HStack>
-                        <Radio value={"INCLUDE"}>포함</Radio>
-                        <Radio value={"EXCEPT"}>제외</Radio>
+                        <Radio value={'INCLUDE'}>포함</Radio>
+                        <Radio value={'EXCEPT'}>제외</Radio>
                       </HStack>
                     </RadioGroup>
                   </FormControl>
                 </VStack>
               </Box>
-              <Box flex={1} w={"50%"} h={"100%"}>
+              <Box flex={1} w={'50%'} h={'100%'}>
                 <VStack p={2}>
-                  <Flex w={"100%"}>
+                  <Flex w={'100%'}>
                     <FormControl
                       marginTop={2}
                       marginRight={5}
@@ -409,33 +409,33 @@ export default function ProjectRegister() {
                     </FormControl>
                   </Flex>
 
-                  <Flex w={"100%"}>
+                  <Flex w={'100%'}>
                     <FormControl marginTop={2} marginRight={5}>
                       <FormLabel>등급</FormLabel>
                       <Select
-                        placeholder={"등급"}
+                        placeholder={'등급'}
                         styles={{
                           control: (styles, props) => ({
-                            backgroundColor: "none",
-                            borderColor: "none",
+                            backgroundColor: 'none',
+                            borderColor: 'none',
                             borderWidth: 0,
                             borderBottomWidth: 1.5,
                             borderRadius: 1,
-                            display: "flex",
-                            ":hover": {
+                            display: 'flex',
+                            ':hover': {
                               borderColor: primaryColor,
                             },
                           }),
                           option: (styles, props) => ({
                             ...styles,
-                            color: "black",
+                            color: 'black',
                             backgroundColor: props.isSelected
                               ? primaryColor
                               : undefined,
-                            ":hover": {
+                            ':hover': {
                               backgroundColor: props.isSelected
                                 ? undefined
-                                : "#edede9",
+                                : '#edede9',
                             },
                           }),
                           singleValue: (styles, props) => ({
@@ -443,7 +443,7 @@ export default function ProjectRegister() {
                             color: primaryColor,
                           }),
                         }}
-                        name={"level"}
+                        name={'level'}
                         options={unitPriceLv.map((lv) => {
                           return {
                             label: lv.label,
@@ -461,15 +461,15 @@ export default function ProjectRegister() {
                       <NumericFormat
                         onKeyUp={keyUpPrice}
                         value={selectedUnitPrice}
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="p-2 rounded-md border-2 border-inherit bg-inherit w-full 
                           focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
                         onChange={onSelectedUnitPriceChange}
                       />
-                      <Flex justifyContent={"flex-end"} marginTop={3}>
+                      <Flex justifyContent={'flex-end'} marginTop={3}>
                         <Button
                           colorScheme="teal"
-                          variant={"ghost"}
+                          variant={'ghost'}
                           onClick={onAddUnitPrice}
                         >
                           추가
@@ -478,36 +478,36 @@ export default function ProjectRegister() {
                     </FormControl>
                   </Flex>
 
-                  <Box w={"100%"}>
+                  <Box w={'100%'}>
                     <FormControl
                       isRequired
                       isInvalid={isConfiguredUnitPriceError}
                     >
                       <FormLabel>설정단가</FormLabel>
                       <Grid
-                        templateColumns={"repeat(4, 1fr)"}
+                        templateColumns={'repeat(4, 1fr)'}
                         gap={5}
-                        w={"100%"}
+                        w={'100%'}
                         marginTop={5}
                       >
                         {unitPrices?.map((up) => {
                           return Object.entries(up).map((keyValue, index) => (
                             <Flex
                               key={index}
-                              w={"100%"}
-                              flexDirection={"column"}
-                              border={"ButtonShadow"}
-                              borderStyle={"outset"}
+                              w={'100%'}
+                              flexDirection={'column'}
+                              border={'ButtonShadow'}
+                              borderStyle={'outset'}
                               borderWidth={1}
                               borderRadius={5}
                               borderColor={primaryColor}
                               p={2}
                             >
                               <Flex
-                                justifyContent={"space-between"}
-                                alignItems={"center"}
+                                justifyContent={'space-between'}
+                                alignItems={'center'}
                               >
-                                <Text fontWeight={"bold"}>
+                                <Text fontWeight={'bold'}>
                                   {convertLevelEnToKo(keyValue[0])}
                                 </Text>
                                 <IconButton
@@ -518,7 +518,7 @@ export default function ProjectRegister() {
                                   colorScheme="teal"
                                   aria-label="delete"
                                   fontSize="15px"
-                                  size={"sm"}
+                                  size={'sm'}
                                   icon={<IoCloseCircleSharp />}
                                 />
                               </Flex>
@@ -526,7 +526,7 @@ export default function ProjectRegister() {
                                 <NumericFormat
                                   value={keyValue[1]}
                                   displayType="text"
-                                  thousandSeparator={","}
+                                  thousandSeparator={','}
                                   className="text-xl font-thin"
                                 />
                               </Box>

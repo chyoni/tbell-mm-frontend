@@ -16,26 +16,26 @@ import {
   IconButton,
   useToast,
   FormErrorMessage,
-} from "@chakra-ui/react";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { NumericFormat } from "react-number-format";
-import Select, { ActionMeta, SingleValue } from "react-select";
-import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
+} from '@chakra-ui/react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { NumericFormat } from 'react-number-format';
+import Select, { ActionMeta, SingleValue } from 'react-select';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   IEditProjectPayload,
   ICUDProjectResponse,
   IGetProject,
   IUnitPrice,
-} from "../../../types/project";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { primaryColor } from "../../../theme";
-import { IGetDepartments } from "../../../types/department";
-import { convertLevelEnToKo, unitPriceLv } from "../../../utils";
-import { IErrorResponse, Option } from "../../../types/common";
-import { IoCloseCircleSharp } from "react-icons/io5";
-import { getDepartments } from "../../../api/departments";
-import { editProject, getProject } from "../../../api/projects";
+} from '../../../types/project';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { primaryColor } from '../../../theme';
+import { IGetDepartments } from '../../../types/department';
+import { convertLevelEnToKo, unitPriceLv } from '../../../utils';
+import { IErrorResponse, Option } from '../../../types/common';
+import { IoCloseCircleSharp } from 'react-icons/io5';
+import { getDepartments } from '../../../api/departments';
+import { editProject, getProject } from '../../../api/projects';
 
 export default function ProjectEdit() {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export default function ProjectEdit() {
   const { contractNumber } = useParams();
 
   const { isLoading, data } = useQuery<IGetProject, Error>({
-    queryKey: ["project", contractNumber],
+    queryKey: ['project', contractNumber],
     queryFn: () => getProject(contractNumber!),
     enabled: contractNumber !== undefined,
   });
@@ -52,15 +52,15 @@ export default function ProjectEdit() {
     IGetDepartments,
     Error
   >({
-    queryKey: ["departments"],
+    queryKey: ['departments'],
     queryFn: () => getDepartments(),
   });
 
-  const [pStatus, setPStatus] = useState<"YEAR" | "SINGLE">();
-  const handleProjectStatus = (value: "YEAR" | "SINGLE") => setPStatus(value);
+  const [pStatus, setPStatus] = useState<'YEAR' | 'SINGLE'>();
+  const handleProjectStatus = (value: 'YEAR' | 'SINGLE') => setPStatus(value);
 
-  const [operationRate, setOperationRate] = useState<"INCLUDE" | "EXCEPT">();
-  const handleOperationRate = (value: "INCLUDE" | "EXCEPT") =>
+  const [operationRate, setOperationRate] = useState<'INCLUDE' | 'EXCEPT'>();
+  const handleOperationRate = (value: 'INCLUDE' | 'EXCEPT') =>
     setOperationRate(value);
 
   const [startDate, setStartDate] = useState<string>();
@@ -104,7 +104,7 @@ export default function ProjectEdit() {
   const keyUpPrice = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === "Enter") onAddUnitPrice();
+    if (e.key === 'Enter') onAddUnitPrice();
   };
 
   const onAddUnitPrice = () => {
@@ -115,14 +115,14 @@ export default function ProjectEdit() {
     ) {
       toast({
         title: `등급 또는 단가를 입력하세요.`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
       return;
     }
 
-    const cleanPrice = selectedUnitPrice.replaceAll(",", "");
+    const cleanPrice = selectedUnitPrice.replaceAll(',', '');
     const clean = selectedLevel.value;
 
     const newUnitPrice = {
@@ -140,7 +140,7 @@ export default function ProjectEdit() {
     }
 
     setUnitPrices(copiedUnitPrices);
-    setSelectedUnitPrice("");
+    setSelectedUnitPrice('');
   };
 
   const editMutation = useMutation<
@@ -163,7 +163,7 @@ export default function ProjectEdit() {
     onSuccess(data, variables, context) {
       toast({
         title: `수정 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -172,8 +172,8 @@ export default function ProjectEdit() {
       console.log(error);
       toast({
         title: `등록 실패`,
-        description: `${error.response.data.errorMessage}`,
-        status: "error",
+        description: `${error.response.data.errorMessage}`,
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -181,7 +181,7 @@ export default function ProjectEdit() {
   });
 
   const onEdit = () => {
-    if (contractNumber === undefined || contractNumber === "") return;
+    if (contractNumber === undefined || contractNumber === '') return;
 
     if (
       isContractorError ||
@@ -219,11 +219,11 @@ export default function ProjectEdit() {
     }
   }, [data]);
 
-  const isContractorError = contractor === undefined || contractor === "";
-  const isDepartmentError = department === undefined || department === "";
-  const isTeamNameError = teamName === undefined || teamName === "";
-  const isStartDateError = startDate === undefined || startDate === "";
-  const isEndDateError = endDate === undefined || endDate === "";
+  const isContractorError = contractor === undefined || contractor === '';
+  const isDepartmentError = department === undefined || department === '';
+  const isTeamNameError = teamName === undefined || teamName === '';
+  const isStartDateError = startDate === undefined || startDate === '';
+  const isEndDateError = endDate === undefined || endDate === '';
   const isConfiguredUnitPriceError = unitPrices.length === 0;
 
   return (
@@ -232,21 +232,21 @@ export default function ProjectEdit() {
         <title>{`프로젝트 수정 - ${contractNumber}`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          프로젝트 수정
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
+          프로젝트 수정
         </Text>
       </Box>
-      <HStack justifyContent={"space-between"}>
+      <HStack justifyContent={'space-between'}>
         <Button
-          variant={"ghost"}
-          size={"sm"}
+          variant={'ghost'}
+          size={'sm'}
           colorScheme="teal"
           onClick={() => navigate(-1)}
         >
           이전으로
         </Button>
         <Button
-          size={"sm"}
+          size={'sm'}
           colorScheme="teal"
           onClick={onEdit}
           isLoading={editMutation.isPending}
@@ -264,13 +264,13 @@ export default function ProjectEdit() {
       </HStack>
       <Skeleton
         isLoaded={!isLoading && !departmentsLoading}
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
       >
         {data && data.ok && departments && departments.ok && (
           <HStack marginTop={10}>
-            <Flex w={"100%"}>
-              <Box flex={1} w={"50%"} h={"100%"}>
+            <Flex w={'100%'}>
+              <Box flex={1} w={'50%'} h={'100%'}>
                 <VStack p={2}>
                   <FormControl marginTop={2} isRequired>
                     <FormLabel>계약번호</FormLabel>
@@ -311,7 +311,7 @@ export default function ProjectEdit() {
                   >
                     <FormLabel>부서</FormLabel>
                     <ChakraSelect
-                      variant={"flushed"}
+                      variant={'flushed'}
                       focusBorderColor={primaryColor}
                       onChange={handleDepartments}
                       value={department}
@@ -353,11 +353,11 @@ export default function ProjectEdit() {
                       value={pStatus}
                       defaultValue={data.data.projectStatus}
                       onChange={handleProjectStatus}
-                      colorScheme={"teal"}
+                      colorScheme={'teal'}
                     >
                       <HStack>
-                        <Radio value={"YEAR"}>연간</Radio>
-                        <Radio value={"SINGLE"}>단건</Radio>
+                        <Radio value={'YEAR'}>연간</Radio>
+                        <Radio value={'SINGLE'}>단건</Radio>
                       </HStack>
                     </RadioGroup>
                   </FormControl>
@@ -368,19 +368,19 @@ export default function ProjectEdit() {
                       value={operationRate}
                       defaultValue={data.data.operationRate}
                       onChange={handleOperationRate}
-                      colorScheme={"teal"}
+                      colorScheme={'teal'}
                     >
                       <HStack>
-                        <Radio value={"INCLUDE"}>포함</Radio>
-                        <Radio value={"EXCEPT"}>제외</Radio>
+                        <Radio value={'INCLUDE'}>포함</Radio>
+                        <Radio value={'EXCEPT'}>제외</Radio>
                       </HStack>
                     </RadioGroup>
                   </FormControl>
                 </VStack>
               </Box>
-              <Box flex={1} w={"50%"} h={"100%"}>
+              <Box flex={1} w={'50%'} h={'100%'}>
                 <VStack p={2}>
-                  <Flex w={"100%"}>
+                  <Flex w={'100%'}>
                     <FormControl
                       marginTop={2}
                       marginRight={5}
@@ -419,33 +419,33 @@ export default function ProjectEdit() {
                     </FormControl>
                   </Flex>
 
-                  <Flex w={"100%"}>
+                  <Flex w={'100%'}>
                     <FormControl marginTop={2} marginRight={5}>
                       <FormLabel>등급</FormLabel>
                       <Select
-                        placeholder={"등급"}
+                        placeholder={'등급'}
                         styles={{
                           control: (styles, props) => ({
-                            backgroundColor: "none",
-                            borderColor: "none",
+                            backgroundColor: 'none',
+                            borderColor: 'none',
                             borderWidth: 0,
                             borderBottomWidth: 1.5,
                             borderRadius: 1,
-                            display: "flex",
-                            ":hover": {
+                            display: 'flex',
+                            ':hover': {
                               borderColor: primaryColor,
                             },
                           }),
                           option: (styles, props) => ({
                             ...styles,
-                            color: "black",
+                            color: 'black',
                             backgroundColor: props.isSelected
                               ? primaryColor
                               : undefined,
-                            ":hover": {
+                            ':hover': {
                               backgroundColor: props.isSelected
                                 ? undefined
-                                : "#edede9",
+                                : '#edede9',
                             },
                           }),
                           singleValue: (styles, props) => ({
@@ -453,7 +453,7 @@ export default function ProjectEdit() {
                             color: primaryColor,
                           }),
                         }}
-                        name={"level"}
+                        name={'level'}
                         options={unitPriceLv.map((lv) => {
                           return {
                             label: lv.label,
@@ -471,15 +471,15 @@ export default function ProjectEdit() {
                       <NumericFormat
                         onKeyUp={keyUpPrice}
                         value={selectedUnitPrice}
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="p-2 rounded-md border-2 border-inherit bg-inherit w-full 
                           focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
                         onChange={onSelectedUnitPriceChange}
                       />
-                      <Flex justifyContent={"flex-end"} marginTop={3}>
+                      <Flex justifyContent={'flex-end'} marginTop={3}>
                         <Button
                           colorScheme="teal"
-                          variant={"ghost"}
+                          variant={'ghost'}
                           onClick={onAddUnitPrice}
                         >
                           추가
@@ -488,36 +488,36 @@ export default function ProjectEdit() {
                     </FormControl>
                   </Flex>
 
-                  <Box w={"100%"}>
+                  <Box w={'100%'}>
                     <FormControl
                       isRequired
                       isInvalid={isLoading && isConfiguredUnitPriceError}
                     >
                       <FormLabel>설정단가</FormLabel>
                       <Grid
-                        templateColumns={"repeat(4, 1fr)"}
+                        templateColumns={'repeat(4, 1fr)'}
                         gap={5}
-                        w={"100%"}
+                        w={'100%'}
                         marginTop={5}
                       >
                         {unitPrices?.map((up) => {
                           return Object.entries(up).map((keyValue, index) => (
                             <Flex
                               key={index}
-                              w={"100%"}
-                              flexDirection={"column"}
-                              border={"ButtonShadow"}
-                              borderStyle={"outset"}
+                              w={'100%'}
+                              flexDirection={'column'}
+                              border={'ButtonShadow'}
+                              borderStyle={'outset'}
                               borderWidth={1}
                               borderRadius={5}
                               borderColor={primaryColor}
                               p={2}
                             >
                               <Flex
-                                justifyContent={"space-between"}
-                                alignItems={"center"}
+                                justifyContent={'space-between'}
+                                alignItems={'center'}
                               >
-                                <Text fontWeight={"bold"}>
+                                <Text fontWeight={'bold'}>
                                   {convertLevelEnToKo(keyValue[0])}
                                 </Text>
                                 <IconButton
@@ -528,7 +528,7 @@ export default function ProjectEdit() {
                                   colorScheme="teal"
                                   aria-label="delete"
                                   fontSize="15px"
-                                  size={"sm"}
+                                  size={'sm'}
                                   icon={<IoCloseCircleSharp />}
                                 />
                               </Flex>
@@ -536,7 +536,7 @@ export default function ProjectEdit() {
                                 <NumericFormat
                                   value={keyValue[1]}
                                   displayType="text"
-                                  thousandSeparator={","}
+                                  thousandSeparator={','}
                                   className="text-xl font-thin"
                                 />
                               </Box>

@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { IGetEmployee } from "../../../types/employee";
-import { IErrorResponse } from "../../../types/common";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { IGetEmployee } from '../../../types/employee';
+import { IErrorResponse } from '../../../types/common';
 import {
   editEmployeeByEmployeeNumber,
   getEmployeeByEmployeeNumber,
-} from "../../../api/employees";
+} from '../../../api/employees';
 import {
   HStack,
   Button,
@@ -20,9 +20,9 @@ import {
   Input,
   Skeleton,
   VStack,
-} from "@chakra-ui/react";
-import { Helmet } from "react-helmet-async";
-import { primaryColor } from "../../../theme";
+} from '@chakra-ui/react';
+import { Helmet } from 'react-helmet-async';
+import { primaryColor } from '../../../theme';
 
 export default function EmployeeEdit() {
   const toast = useToast();
@@ -30,7 +30,7 @@ export default function EmployeeEdit() {
   const { employeeNumber } = useParams();
 
   const { isLoading, data } = useQuery<IGetEmployee, IErrorResponse>({
-    queryKey: ["employee"],
+    queryKey: ['employee'],
     queryFn: () => getEmployeeByEmployeeNumber(employeeNumber!),
     enabled: employeeNumber !== undefined,
   });
@@ -44,9 +44,9 @@ export default function EmployeeEdit() {
     }
   }, [data]);
 
-  const [editName, setEditName] = useState<string>("");
-  const [editStartDate, setEditStartDate] = useState<string>("");
-  const [editResignationDate, setEditResignationDate] = useState<string>("");
+  const [editName, setEditName] = useState<string>('');
+  const [editStartDate, setEditStartDate] = useState<string>('');
+  const [editResignationDate, setEditResignationDate] = useState<string>('');
 
   const handleName = (e: ChangeEvent<HTMLInputElement>) =>
     setEditName(e.target.value);
@@ -58,10 +58,10 @@ export default function EmployeeEdit() {
   const onRegister = () => {
     if (
       employeeNumber === undefined ||
-      employeeNumber === "" ||
+      employeeNumber === '' ||
       editName === undefined ||
-      editName === "" ||
-      editStartDate === "" ||
+      editName === '' ||
+      editStartDate === '' ||
       editStartDate === undefined
     )
       return;
@@ -79,7 +79,7 @@ export default function EmployeeEdit() {
     onSuccess: () => {
       toast({
         title: `수정 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -88,37 +88,37 @@ export default function EmployeeEdit() {
       console.log(error);
       toast({
         title: `수정 실패`,
-        description: `${error.response.data.errorMessage}`,
-        status: "error",
+        description: `${error.response.data.errorMessage}`,
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
     },
   });
 
-  const isNameError = editName === "" || editName === undefined;
-  const isStartDateError = editStartDate === "" || editStartDate === undefined;
+  const isNameError = editName === '' || editName === undefined;
+  const isStartDateError = editStartDate === '' || editStartDate === undefined;
   return (
     <>
       <Helmet>
         <title>{`사원 수정 - ${employeeNumber}`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
           사원 수정
         </Text>
       </Box>
-      <HStack justifyContent={"space-between"}>
+      <HStack justifyContent={'space-between'}>
         <Button
-          variant={"ghost"}
-          size={"sm"}
+          variant={'ghost'}
+          size={'sm'}
           colorScheme="teal"
           onClick={() => navigate(-1)}
         >
           이전으로
         </Button>
         <Button
-          size={"sm"}
+          size={'sm'}
           colorScheme="teal"
           onClick={onRegister}
           isLoading={editMutation.isPending}
@@ -128,13 +128,13 @@ export default function EmployeeEdit() {
         </Button>
       </HStack>
       <Skeleton
-        isLoaded={!isLoading && data && data.ok && editName !== ""}
-        height={"50%"}
+        isLoaded={!isLoading && data && data.ok && editName !== ''}
+        height={'50%'}
         fadeDuration={1.6}
       >
         <HStack marginTop={10}>
-          <Flex w={"100%"}>
-            <Box flex={1} w={"50%"} h={"100%"}>
+          <Flex w={'100%'}>
+            <Box flex={1} w={'50%'} h={'100%'}>
               <VStack p={2}>
                 <FormControl marginTop={2} isRequired isReadOnly>
                   <FormLabel>사번</FormLabel>
@@ -161,7 +161,7 @@ export default function EmployeeEdit() {
                   )}
                 </FormControl>
 
-                <Flex w={"100%"}>
+                <Flex w={'100%'}>
                   <FormControl
                     marginTop={2}
                     marginRight={5}

@@ -6,43 +6,43 @@ import {
   Icon,
   Text,
   useColorMode,
-} from "@chakra-ui/react";
-import React from "react";
-import { FaMoon } from "react-icons/fa6";
-import { IoSunny } from "react-icons/io5";
-import { Link } from "react-router-dom";
+} from '@chakra-ui/react';
+import React from 'react';
+import { FaMoon } from 'react-icons/fa6';
+import { IoSunny } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <Box
-      userSelect={"none"}
-      w={"full"}
+      userSelect={'none'}
+      w={'full'}
       zIndex={10000}
       height={14}
-      position={"fixed"}
-      borderBottomStyle={"groove"}
+      position={'fixed'}
+      borderBottomStyle={'groove'}
       borderBottomWidth={1}
-      bgColor={colorMode === "light" ? "white" : "#1A202C"}
+      bgColor={colorMode === 'light' ? 'white' : '#1A202C'}
     >
       <Flex
-        w={"full"}
+        w={'full'}
         px={2}
         py={1}
-        justifyContent={"space-between"}
-        h={"full"}
+        justifyContent={'space-between'}
+        h={'full'}
       >
-        <HStack alignItems={"center"} justifyContent={"center"} pl={2}>
-          <Link to={"/"}>
-            <Text fontSize={"2xl"} fontStyle={"italic"} fontWeight={"black"}>
+        <HStack alignItems={'center'} justifyContent={'center'} pl={2}>
+          <Link to={'/mms'}>
+            <Text fontSize={'2xl'} fontStyle={'italic'} fontWeight={'black'}>
               TBELL
             </Text>
           </Link>
         </HStack>
-        <HStack alignItems={"center"} justifyContent={"center"}>
-          <Button variant={"outline"} size={"sm"} onClick={toggleColorMode}>
-            <Icon as={colorMode === "light" ? IoSunny : FaMoon} />{" "}
+        <HStack alignItems={'center'} justifyContent={'center'}>
+          <Button variant={'outline'} size={'sm'} onClick={toggleColorMode}>
+            <Icon as={colorMode === 'light' ? IoSunny : FaMoon} />{' '}
           </Button>
         </HStack>
       </Flex>

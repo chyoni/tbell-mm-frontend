@@ -23,20 +23,19 @@ import {
   ModalFooter,
   useDisclosure,
   useToast,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
-import Pagination from "../../../components/pagination";
-import { primaryColor } from "../../../theme";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ICRUDDepartmentRes, IGetDepartments } from "../../../types/department";
-import { deleteDepartment, getDepartments } from "../../../api/departments";
-import { IErrorResponse } from "../../../types/common";
+} from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import Pagination from '../../../components/pagination';
+import { primaryColor } from '../../../theme';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ICRUDDepartmentRes, IGetDepartments } from '../../../types/department';
+import { deleteDepartment, getDepartments } from '../../../api/departments';
+import { IErrorResponse } from '../../../types/common';
 
 export default function Departments() {
   const toast = useToast();
-  const navigate = useNavigate();
   const [page, setPage] = useState<number>(0);
   // 첫번째 페이지 Function
   const goToFirstPage = () => setPage(0);
@@ -48,11 +47,11 @@ export default function Departments() {
   const goToLastPage = (lastPage: number) => setPage(lastPage);
   // 특정 페이지 지정 Function
   const goToSpecificPage = (page: number) => setPage(page);
-  const [departmentName, setDepartmentName] = useState<string>("");
+  const [departmentName, setDepartmentName] = useState<string>('');
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       searchByCond();
     }
   };
@@ -60,7 +59,7 @@ export default function Departments() {
   const searchByCond = async () => await refetch();
 
   const { data, isLoading, refetch } = useQuery<IGetDepartments, Error>({
-    queryKey: ["departments"],
+    queryKey: ['departments'],
     queryFn: () => getDepartments(page, 100, departmentName),
   });
 
@@ -70,10 +69,10 @@ export default function Departments() {
     onClose: onDeleteClose,
   } = useDisclosure();
 
-  const [deleteDepartmentName, setDeleteDepartmentName] = useState<string>("");
+  const [deleteDepartmentName, setDeleteDepartmentName] = useState<string>('');
 
   const onDeleteDepartment = () => {
-    if (deleteDepartmentName === "" || deleteDepartmentName === undefined)
+    if (deleteDepartmentName === '' || deleteDepartmentName === undefined)
       return;
     deleteMutation.mutate();
   };
@@ -83,22 +82,22 @@ export default function Departments() {
     onSuccess: () => {
       toast({
         title: `삭제 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
 
       setTimeout(() => {
-        navigate("/departments");
-      }, 1500);
+        window.location.reload();
+      }, 2000);
     },
 
     onError: (error) => {
       console.log(error);
       toast({
         title: `삭제 실패`,
-        description: `${error.response.data.errorMessage}`,
-        status: "error",
+        description: `${error.response.data.errorMessage}`,
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -110,13 +109,13 @@ export default function Departments() {
         <title>부서 리스트</title>
       </Helmet>
       <Box marginBottom={5}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
           부서 리스트
         </Text>
       </Box>
       <HStack marginBottom={5} spacing={8}>
-        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
-          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
+        <Box width={'max-content'} alignItems={'center'} display={'flex'}>
+          <Text fontWeight={'hairline'} width={'max-content'} marginRight={2}>
             부서명
           </Text>
           <Input
@@ -132,7 +131,7 @@ export default function Departments() {
         </Box>
         <Button
           colorScheme="teal"
-          size={"sm"}
+          size={'sm'}
           onClick={searchByCond}
           onKeyUp={handleKeyUp}
         >
@@ -141,23 +140,23 @@ export default function Departments() {
       </HStack>
       <Skeleton
         isLoaded={!isLoading}
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
         speed={5}
       >
         {data && data.errorMessage && (
           <Center>
-            <Text fontSize={"xx-large"} fontWeight={600}>
+            <Text fontSize={'xx-large'} fontWeight={600}>
               Oops!
             </Text>
-            <Text mt={2} fontSize={"large"}>
+            <Text mt={2} fontSize={'large'}>
               {data.errorMessage}
             </Text>
           </Center>
         )}
         {data && data.ok && (
           <TableContainer>
-            <Table size={"sm"}>
+            <Table size={'sm'}>
               <TableCaption>
                 <Pagination
                   totalPages={data.data.totalPages}
@@ -171,8 +170,8 @@ export default function Departments() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th w={"90%"}>부서명</Th>
-                  <Th w={"10%"}>작업</Th>
+                  <Th w={'90%'}>부서명</Th>
+                  <Th w={'10%'}>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -181,11 +180,11 @@ export default function Departments() {
                     <Td>{p.name}</Td>
                     <Td>
                       <HStack spacing={2}>
-                        <Button size={"xs"} colorScheme="teal">
+                        <Button size={'xs'} colorScheme="teal">
                           <Link to={`edit/${p.name}`}>수정</Link>
                         </Button>
                         <Button
-                          size={"xs"}
+                          size={'xs'}
                           colorScheme="red"
                           onClick={() => {
                             onDeleteToggle();
@@ -205,7 +204,7 @@ export default function Departments() {
                             </ModalBody>
                             <ModalFooter>
                               <Button
-                                variant={"outline"}
+                                variant={'outline'}
                                 mr={3}
                                 onClick={onDeleteClose}
                               >
