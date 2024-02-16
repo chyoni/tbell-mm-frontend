@@ -2,11 +2,11 @@ import { Center, Text } from "@chakra-ui/react";
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
-export default function Home() {
+export default function ByEmployeeStatistics() {
   return (
     <>
       <Helmet>
-        <title>{`공수율 시스템 대시보드`}</title>
+        <title>{`사원별 프로젝트 수행현황`}</title>
       </Helmet>
       <Center>
         <Text fontSize={"xx-large"} fontWeight={"bold"}>

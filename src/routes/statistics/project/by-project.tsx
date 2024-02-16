@@ -71,7 +71,7 @@ function getCopyEmployeeHistoryStateAndIndex(
   };
 }
 
-export default function ProjectStatisticsCurrentCondition() {
+export default function ByProjectStatistics() {
   const toast = useToast();
   const { contractNumber } = useParams();
   const navigate = useNavigate();
