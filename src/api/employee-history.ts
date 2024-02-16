@@ -26,13 +26,15 @@ export const addEmployeeHistory = (
     .then((res) => res.data);
 
 export const getEmployeeHistory = (
-  contractNumber: string,
+  page = 0,
+  contractNumber?: string,
   year: string = new Date().getFullYear().toString(),
   employeeName?: string
 ): Promise<IGetEmployeeHistories> =>
   instance
     .get(`history`, {
       params: {
+        page,
         contractNumber,
         ...(year && year !== undefined && year !== "" && { year }),
         ...(employeeName &&

@@ -47,7 +47,7 @@ import { convertLevelEnToKo } from "../../../utils";
 import { NumericFormat } from "react-number-format";
 import Pagination from "../../../components/pagination";
 
-function getCopyEmployeeHistoryStateAndIndex(
+export function getCopyEmployeeHistoryStateAndIndex(
   employeeHistory: IEmployeeHistory[],
   employeeHistoryId: number,
   manMonthId: number
@@ -108,7 +108,7 @@ export default function ByProjectStatistics() {
   >({
     queryKey: ["employeeHistory"],
     queryFn: () =>
-      getEmployeeHistory(contractNumber!, searchYear, searchEmployeeName),
+      getEmployeeHistory(page, contractNumber, searchYear, searchEmployeeName),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
   });

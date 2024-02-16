@@ -16,6 +16,7 @@ import ProjectStatisticsList from "./routes/statistics/project/list";
 import ProjectStatisticsAddEmployee from "./routes/statistics/project/add-employee";
 import ByProjectStatistics from "./routes/statistics/project/by-project";
 import ByEmployeeStatistics from "./routes/statistics/employee/by-employee";
+import EmployeeStatisticsList from "./routes/statistics/employee/list";
 
 const router = createBrowserRouter([
   {
@@ -40,7 +41,11 @@ const router = createBrowserRouter([
         element: <ProjectStatisticsAddEmployee />,
       },
       {
-        path: "statistics/employee",
+        path: "statistics/employees",
+        element: <EmployeeStatisticsList />,
+      },
+      {
+        path: "statistics/employees/:employeeName",
         element: <ByEmployeeStatistics />,
       },
       {
