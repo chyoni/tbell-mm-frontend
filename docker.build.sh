@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git pull origin master
+
 docker stop tbell-mm-frontend
 
 docker rm -f tbell-mm-frontend
