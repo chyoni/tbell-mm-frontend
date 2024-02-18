@@ -4,13 +4,14 @@ import {
   Flex,
   HStack,
   Icon,
-  Text,
+  Image,
   useColorMode,
 } from '@chakra-ui/react';
 import React from 'react';
 import { FaMoon } from 'react-icons/fa6';
 import { IoSunny } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 export default function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -35,9 +36,12 @@ export default function Header() {
       >
         <HStack alignItems={'center'} justifyContent={'center'} pl={2}>
           <Link to={'/mms'}>
-            <Text fontSize={'2xl'} fontStyle={'italic'} fontWeight={'black'}>
-              TBELL
-            </Text>
+            <Image
+              src={logo}
+              boxSize={'40px'}
+              borderRadius={'full'}
+              alt={'TBELL'}
+            />
           </Link>
         </HStack>
         <HStack alignItems={'center'} justifyContent={'center'}>
