@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "티벨 공수율 시스템 애플리케이션",
+  "name": "TBELL ManMonth Application",
   "icons": [
     {
       "src": "favicon.ico",
