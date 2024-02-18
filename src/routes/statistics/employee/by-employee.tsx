@@ -18,20 +18,28 @@ import {
   ModalOverlay,
   Skeleton,
   Text,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
+  IAddHistoryManMonthPayload,
+  ICompleteHistoryPayload,
+  ICompleteHistoryRes,
   IEmployeeHistory,
   IGetEmployeeHistories,
 } from '../../../types/employee-history';
 import { IErrorResponse } from '../../../types/common';
-import { getEmployeeHistory } from '../../../api/employee-history';
+import {
+  completeHistory,
+  getEmployeeHistory,
+  saveHistoryManMonths,
+} from '../../../api/employee-history';
 import { primaryColor, titleColor } from '../../../theme';
-import NoContent from '../../../components/no-content';
 import { NumericFormat } from 'react-number-format';
 import { convertLevelEnToKo } from '../../../utils';
 import { getCopyEmployeeHistoryStateAndIndex } from '../project/by-project';
@@ -40,6 +48,7 @@ import NoContentHistory from '../../../components/no-content-history';
 
 export default function ByEmployeeStatistics() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { employeeName } = useParams();
   const [searchYear, setSearchYear] = useState<string>(
     new Date().getFullYear().toString()
@@ -144,12 +153,6 @@ export default function ByEmployeeStatistics() {
         indexToUpdateManMonth
       ].calculatePrice;
 
-    console.log(
-      (plPrice && calculatePrice) ||
-        (!plPrice && calculatePrice) ||
-        (plPrice && !calculatePrice)
-    );
-
     // 변경할 mm 객체에 대해서 기존값은 그대로 두고 inputPrice의 값을 수정(추가)한다.
     updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
       indexToUpdateManMonth
@@ -224,7 +227,145 @@ export default function ByEmployeeStatistics() {
     setCalculateManMonthInputs(copyCalculateManMonthInputs);
   };
 
-  console.log(isLoading, data);
+  const completeHistoryMutation = useMutation<
+    ICompleteHistoryRes,
+    IErrorResponse,
+    ICompleteHistoryPayload
+  >({
+    mutationFn: (variables: ICompleteHistoryPayload) =>
+      completeHistory(variables.historyId, variables.endDate),
+    onSuccess: () => {
+      toast({
+        title: `등록 완료`,
+        status: 'success',
+        duration: 1500,
+        isClosable: true,
+      });
+      if (isEndDateModalOpen) onEndDateToggle();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `투입종료일 지정 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const addHistoryManMonthsMutation = useMutation<
+    IGetEmployeeHistories,
+    IErrorResponse,
+    IAddHistoryManMonthPayload
+  >({
+    mutationFn: (variables: IAddHistoryManMonthPayload) =>
+      saveHistoryManMonths(variables.historyId, variables.payload),
+    onSuccess: () => {
+      toast({
+        title: `등록 완료`,
+        status: 'success',
+        duration: 1500,
+        isClosable: true,
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast({
+        title: `등록 실패`,
+        description: `${error.response.data.errorMessage}`,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const handleSave = async (employeeId: number): Promise<void> => {
+    const history = employeeHistory.find((h) => h.id === employeeId);
+
+    if (history === null || history === undefined) return;
+
+    const payload = history.mms.filter((mm) => {
+      if (mm.calculateLevel === null || mm.calculateLevel === undefined)
+        return false;
+      if (mm.calculateManMonth === null || mm.calculateManMonth === undefined)
+        return false;
+      if (mm.calculatePrice === null || mm.calculatePrice === undefined)
+        return false;
+      if (
+        mm.inputPrice === null ||
+        mm.inputPrice === undefined ||
+        mm.inputPrice === 0
+      )
+        return false;
+      if (
+        mm.monthSalary === null ||
+        mm.monthSalary === undefined ||
+        mm.monthSalary === 0
+      )
+        return false;
+      if (mm.plPrice === null || mm.plPrice === undefined) return false;
+
+      return true;
+    });
+
+    addHistoryManMonthsMutation.mutate({
+      historyId: history.id.toString(),
+      payload,
+    });
+  };
+
+  const handleCompleteHistory = () => {
+    if (
+      makeEndDate === '' ||
+      makeEndDate === null ||
+      makeEndDate === undefined
+    ) {
+      toast({
+        title: `투입종료일 지정이 되지 않았습니다.`,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (
+      selectedMakeEndDateHistory === undefined ||
+      selectedMakeEndDateHistory === null
+    )
+      return;
+    completeHistoryMutation.mutate({
+      historyId: selectedMakeEndDateHistory.id.toString(),
+      endDate: makeEndDate,
+    });
+  };
+
+  const {
+    onToggle: onEndDateToggle,
+    isOpen: isEndDateModalOpen,
+    onClose: onEndDateModalClose,
+  } = useDisclosure();
+
+  const [selectedMakeEndDateHistory, setSelectedMakeEndDateHistory] =
+    useState<IEmployeeHistory>();
+
+  const [makeEndDate, setMakeEndDate] = useState<string>('');
+  const handlePopupPreSet = (emp: IEmployeeHistory) => {
+    setSelectedMakeEndDateHistory(emp);
+
+    setMakeEndDate(emp.endDate ? emp.endDate : '');
+
+    onEndDateToggle();
+  };
+
+  const isMakeEndDateError = makeEndDate === undefined || makeEndDate === '';
+
+  const handleMakeEndDate = (e: ChangeEvent<HTMLInputElement>) => {
+    setMakeEndDate(e.target.value);
+  };
 
   return (
     <>
@@ -355,7 +496,7 @@ export default function ByEmployeeStatistics() {
                   variant={'outline'}
                   p={1}
                   colorScheme={'teal'}
-                  onClick={() => null}
+                  onClick={() => handleSave(ph.id)}
                 >
                   변경사항 저장
                 </Button>
@@ -365,23 +506,24 @@ export default function ByEmployeeStatistics() {
                   variant={'outline'}
                   p={1}
                   colorScheme={'red'}
-                  onClick={() => null}
+                  onClick={() => {
+                    handlePopupPreSet(ph);
+                  }}
                 >
                   투입종료일 지정
                 </Button>
-                {/* <Modal
+                <Modal
                   isOpen={isEndDateModalOpen}
                   onClose={onEndDateModalClose}
-                  size={"xl"}
+                  size={'xl'}
                 >
                   <ModalOverlay />
                   <ModalContent>
                     <ModalHeader>투입종료일 지정</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                      
-                      <Flex direction={"column"}>
-                        <Text fontWeight={"hairline"} fontSize={"x-large"}>
+                      <Flex direction={'column'}>
+                        <Text fontWeight={'hairline'} fontSize={'x-large'}>
                           {`${selectedMakeEndDateHistory?.employee.name}(${selectedMakeEndDateHistory?.employee.employeeNumber})`}
                         </Text>
                         <FormControl
@@ -415,7 +557,7 @@ export default function ByEmployeeStatistics() {
                     </ModalBody>
                     <ModalFooter>
                       <Button
-                        variant={"outline"}
+                        variant={'outline'}
                         mr={3}
                         onClick={onEndDateModalClose}
                       >
@@ -431,7 +573,7 @@ export default function ByEmployeeStatistics() {
                       </Button>
                     </ModalFooter>
                   </ModalContent>
-                </Modal> */}
+                </Modal>
               </Flex>
 
               <Flex
