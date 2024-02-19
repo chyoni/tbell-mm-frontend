@@ -242,6 +242,7 @@ export default function ByEmployeeStatistics() {
         isClosable: true,
       });
       if (isEndDateModalOpen) onEndDateToggle();
+      searchByCond();
     },
     onError: (error) => {
       console.log(error);
@@ -534,11 +535,7 @@ export default function ByEmployeeStatistics() {
                           <Input
                             size="md"
                             type="date"
-                            value={
-                              selectedMakeEndDateHistory?.endDate
-                                ? selectedMakeEndDateHistory.endDate
-                                : makeEndDate
-                            }
+                            value={makeEndDate}
                             focusBorderColor={primaryColor}
                             onChange={handleMakeEndDate}
                           />
