@@ -518,7 +518,7 @@ export default function ByEmployeeStatistics() {
                 >
                   <ModalOverlay />
                   <ModalContent>
-                    <ModalHeader>투입종료일 지정</ModalHeader>
+                    <ModalHeader>{`[${selectedMakeEndDateHistory?.project.teamName}] 투입종료일 지정`}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                       <Flex direction={"column"}>
