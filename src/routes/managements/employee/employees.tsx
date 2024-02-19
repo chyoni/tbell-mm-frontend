@@ -23,16 +23,16 @@ import {
   Tr,
   useDisclosure,
   useToast,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { primaryColor } from '../../../theme';
-import Pagination from '../../../components/pagination';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { IGetEmployee, IGetEmployees } from '../../../types/employee';
-import { deleteEmployee, getEmployees } from '../../../api/employees';
-import { Link } from 'react-router-dom';
-import { IErrorResponse } from '../../../types/common';
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { primaryColor } from "../../../theme";
+import Pagination from "../../../components/pagination";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { IGetEmployee, IGetEmployees } from "../../../types/employee";
+import { deleteEmployee, getEmployees } from "../../../api/employees";
+import { Link } from "react-router-dom";
+import { IErrorResponse } from "../../../types/common";
 
 export default function Employees() {
   const toast = useToast();
@@ -48,20 +48,20 @@ export default function Employees() {
   // 특정 페이지 지정 Function
   const goToSpecificPage = (page: number) => setPage(page);
 
-  const [searchName, setSearchName] = useState<string>('');
-  const [searchEmployeeNumber, setSearchEmployeeNumber] = useState<string>('');
-  const [searchStartDate, setSearchStartDate] = useState<string>('');
+  const [searchName, setSearchName] = useState<string>("");
+  const [searchEmployeeNumber, setSearchEmployeeNumber] = useState<string>("");
+  const [searchStartDate, setSearchStartDate] = useState<string>("");
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       searchByCond();
     }
   };
   const searchByCond = async () => await refetch();
 
   const { isLoading, data, refetch } = useQuery<IGetEmployees, IErrorResponse>({
-    queryKey: ['employees'],
+    queryKey: ["employees"],
     queryFn: () =>
       getEmployees(page, 10, searchName, searchEmployeeNumber, searchStartDate),
     refetchOnWindowFocus: true,
@@ -72,9 +72,9 @@ export default function Employees() {
     isOpen: isDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
-  const [deleteEmployeeNumber, setDeleteEmployeeNumber] = useState<string>('');
+  const [deleteEmployeeNumber, setDeleteEmployeeNumber] = useState<string>("");
   const onDeleteEmployee = () => {
-    if (deleteEmployeeNumber === '' || deleteEmployeeNumber === undefined)
+    if (deleteEmployeeNumber === "" || deleteEmployeeNumber === undefined)
       return;
     deleteMutation.mutate();
   };
@@ -84,7 +84,7 @@ export default function Employees() {
     onSuccess: () => {
       toast({
         title: `삭제 완료`,
-        status: 'success',
+        status: "success",
         duration: 1200,
         isClosable: true,
       });
@@ -98,7 +98,7 @@ export default function Employees() {
       toast({
         title: `삭제 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: 'error',
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
@@ -110,13 +110,13 @@ export default function Employees() {
         <title>사원 리스트</title>
       </Helmet>
       <Box marginBottom={5}>
-        <Text fontWeight={'semibold'} fontSize={'2xl'}>
+        <Text fontWeight={"semibold"} fontSize={"2xl"}>
           사원 리스트
         </Text>
       </Box>
       <HStack marginBottom={5} spacing={8}>
-        <Box width={'max-content'} alignItems={'center'} display={'flex'}>
-          <Text fontWeight={'hairline'} width={'max-content'} marginRight={2}>
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
             사번
           </Text>
           <Input
@@ -130,8 +130,8 @@ export default function Employees() {
             onKeyUp={handleKeyUp}
           />
         </Box>
-        <Box width={'max-content'} alignItems={'center'} display={'flex'}>
-          <Text fontWeight={'hairline'} width={'max-content'} marginRight={2}>
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={"max-content"} marginRight={2}>
             사원명
           </Text>
           <Input
@@ -145,8 +145,8 @@ export default function Employees() {
             onKeyUp={handleKeyUp}
           />
         </Box>
-        <Box width={'max-content'} alignItems={'center'} display={'flex'}>
-          <Text fontWeight={'hairline'} width={'60px'} marginRight={2}>
+        <Box width={"max-content"} alignItems={"center"} display={"flex"}>
+          <Text fontWeight={"hairline"} width={"60px"} marginRight={2}>
             입사일
           </Text>
           <Input
@@ -159,7 +159,7 @@ export default function Employees() {
         </Box>
         <Button
           colorScheme="teal"
-          size={'sm'}
+          size={"sm"}
           onClick={searchByCond}
           onKeyUp={handleKeyUp}
         >
@@ -168,23 +168,23 @@ export default function Employees() {
       </HStack>
       <Skeleton
         isLoaded={!isLoading}
-        height={'50%'}
+        height={"50%"}
         fadeDuration={1.6}
         speed={5}
       >
         {data && data.errorMessage && (
           <Center>
-            <Text fontSize={'xx-large'} fontWeight={600}>
+            <Text fontSize={"xx-large"} fontWeight={600}>
               Oops!
             </Text>
-            <Text mt={2} fontSize={'large'}>
+            <Text mt={2} fontSize={"large"}>
               {data.errorMessage}
             </Text>
           </Center>
         )}
         {data && data.ok && (
           <TableContainer>
-            <Table size={'sm'}>
+            <Table size={"sm"}>
               <TableCaption>
                 <Pagination
                   totalPages={data.data.totalPages}
@@ -198,11 +198,11 @@ export default function Employees() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th w={'20%'}>사번</Th>
-                  <Th w={'20%'}>이름</Th>
-                  <Th w={'25%'}>입사일</Th>
-                  <Th w={'25%'}>퇴사일</Th>
-                  <Th w={'10%'}>작업</Th>
+                  <Th w={"20%"}>사번</Th>
+                  <Th w={"20%"}>이름</Th>
+                  <Th w={"25%"}>입사일</Th>
+                  <Th w={"25%"}>퇴사일</Th>
+                  <Th w={"10%"}>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -211,14 +211,14 @@ export default function Employees() {
                     <Td>{emp.employeeNumber}</Td>
                     <Td>{emp.name}</Td>
                     <Td>{emp.startDate}</Td>
-                    <Td>{emp.resignationDate ? emp.resignationDate : '-'}</Td>
+                    <Td>{emp.resignationDate ? emp.resignationDate : "-"}</Td>
                     <Td>
                       <HStack spacing={2}>
-                        <Button size={'xs'} colorScheme="teal">
+                        <Button size={"xs"} colorScheme="teal">
                           <Link to={`edit/${emp.employeeNumber}`}>수정</Link>
                         </Button>
                         <Button
-                          size={'xs'}
+                          size={"xs"}
                           colorScheme="red"
                           onClick={() => {
                             onDeleteToggle();
@@ -226,6 +226,11 @@ export default function Employees() {
                           }}
                         >
                           삭제
+                        </Button>
+                        <Button size={"xs"} colorScheme={"messenger"}>
+                          <Link to={`/mms/statistics/employees/${emp.name}`}>
+                            수행현황
+                          </Link>
                         </Button>
                         <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
                           <ModalOverlay />
@@ -239,7 +244,7 @@ export default function Employees() {
                             </ModalBody>
                             <ModalFooter>
                               <Button
-                                variant={'outline'}
+                                variant={"outline"}
                                 mr={3}
                                 onClick={onDeleteClose}
                               >
