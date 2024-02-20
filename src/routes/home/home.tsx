@@ -93,8 +93,6 @@ export default function Home() {
     }
   }, [data]);
 
-  console.log(isLoading, data, statisticsByYear);
-
   return (
     <>
       <Helmet>
