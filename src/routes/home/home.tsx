@@ -25,6 +25,7 @@ import { IGetEmployees } from "../../types/employee";
 import { getEmployees } from "../../api/employees";
 import { IGetProjects } from "../../types/project";
 import { getProjects } from "../../api/projects";
+import NoContent from "../../components/no-content";
 
 export default function Home() {
   const [year, setYear] = useState<string>(new Date().getFullYear().toString());
@@ -109,6 +110,7 @@ export default function Home() {
           py={5}
           border={"ButtonFace"}
           borderStyle={"dashed"}
+          borderColor={primaryColor}
           borderRadius={20}
           borderWidth={2}
           direction={"column"}
@@ -229,6 +231,7 @@ export default function Home() {
           <Stat
             borderWidth={2}
             borderStyle={"dashed"}
+            borderColor={primaryColor}
             padding={2}
             borderRadius={10}
             width={"min-content"}
@@ -245,6 +248,7 @@ export default function Home() {
           <Stat
             borderWidth={2}
             borderStyle={"dashed"}
+            borderColor={primaryColor}
             padding={2}
             borderRadius={10}
             width={"min-content"}
