@@ -25,13 +25,20 @@ import { IGetEmployees } from "../../types/employee";
 import { getEmployees } from "../../api/employees";
 import { IGetProjects } from "../../types/project";
 import { getProjects } from "../../api/projects";
-import NoContent from "../../components/no-content";
+import { ResponsiveLine, Serie } from "@nivo/line";
 
 export default function Home() {
   const [year, setYear] = useState<string>(new Date().getFullYear().toString());
+  const [currentSelectedYear, setCurrentSelectedYear] = useState<string>(
+    new Date().getFullYear().toString()
+  );
   const [statisticsByYear, setStatisticsByYear] = useState<IGetStatistics[]>(
     []
   );
+  const [statisticsLineData, setStatisticsLineData] = useState<Serie>({
+    id: `${currentSelectedYear} 정산금액 추이`,
+    data: [],
+  });
 
   const { isLoading, data, refetch } = useQuery<
     IGetStatisticsRes,
@@ -40,6 +47,7 @@ export default function Home() {
     queryKey: ["statistics"],
     queryFn: () => getHistoryStatistics(year),
     refetchOnWindowFocus: false,
+    refetchInterval: 300000,
   });
 
   const { isLoading: employeesLoading, data: employeesData } = useQuery<
@@ -65,13 +73,31 @@ export default function Home() {
   ) => {
     if (e.key === "Enter") {
       searchByCond();
+      setCurrentSelectedYear(year);
     }
   };
-  const searchByCond = async () => await refetch();
+  const searchByCond = async () => {
+    await refetch();
+    setCurrentSelectedYear(year);
+  };
 
   useEffect(() => {
     if (data?.ok && data.data) {
       const cleanStatisticsByYear = [...data.data];
+
+      const cleanStatisticsLineData: Serie = {
+        id: `${year} 정산금액 추이`,
+        data: [],
+      };
+
+      data.data.forEach((d) => {
+        const x = `${year}-${d.month}-1`;
+        const y = d.totalCalculatePrice || 0;
+
+        const data = { x, y };
+
+        cleanStatisticsLineData.data.push(data);
+      });
 
       for (let month = 1; month <= 12; month++) {
         const existsMonth = cleanStatisticsByYear.findIndex(
@@ -86,13 +112,26 @@ export default function Home() {
             totalInputManMonth: null,
             totalInputPrice: null,
           });
+
+          cleanStatisticsLineData.data.push({
+            x: `${year}-${month}-1`,
+            y: 0,
+          });
         }
       }
 
       cleanStatisticsByYear.sort((prev, next) => prev.month - next.month);
+      cleanStatisticsLineData.data.sort(
+        (prev, next) =>
+          parseInt(prev.x!.toString().split("-", -1)[1]) -
+          parseInt(next.x!.toString().split("-", -1)[1])
+      );
       setStatisticsByYear(cleanStatisticsByYear);
+      setStatisticsLineData(cleanStatisticsLineData);
     }
-  }, [data]);
+  }, [data, year]);
+
+  console.log(statisticsLineData);
 
   return (
     <>
@@ -108,7 +147,7 @@ export default function Home() {
           marginTop={8}
           px={10}
           py={5}
-          border={"ButtonFace"}
+          border={"InactiveBorder"}
           borderStyle={"dashed"}
           borderRadius={20}
           borderWidth={2}
@@ -222,6 +261,107 @@ export default function Home() {
           {/* 데이터 끝 */}
         </VStack>
       </Skeleton>
+
+      <Skeleton isLoaded={!isLoading}>
+        <HStack>
+          <Box
+            height={"40vh"}
+            w={"full"}
+            borderRadius={10}
+            border={"InactiveBorder"}
+            borderStyle={"dashed"}
+            borderWidth={2}
+            padding={2}
+            marginTop={4}
+          >
+            <Flex justifyContent={"space-between"} marginBottom={3}>
+              <Text fontWeight={"bold"} fontSize={"sm"}>
+                {`${currentSelectedYear} 정산금액 추이도`}
+              </Text>
+              <Text fontSize={"sm"} color={"#C6C7C9"}>
+                {getKoreaDateTime()} 기준
+              </Text>
+            </Flex>
+            <ResponsiveLine
+              animate
+              motionConfig="wobbly"
+              enableArea
+              areaOpacity={0.07}
+              colors={["rgb(97, 205, 187)", "rgb(244, 117, 96)"]}
+              crosshairType="cross"
+              axisBottom={{
+                format: "%b",
+                legendOffset: -12,
+                tickValues: "every 1 months",
+              }}
+              curve="monotoneX"
+              data={[statisticsLineData]}
+              enablePointLabel
+              enableGridX={true}
+              margin={{
+                bottom: 60,
+                left: 80,
+                right: 150,
+                top: 20,
+              }}
+              pointBorderColor={{
+                from: "color",
+                modifiers: [["darker", 0.3]],
+              }}
+              theme={{
+                text: {
+                  fill: "#878d8c",
+                },
+                tooltip: {
+                  container: { color: "black" },
+                },
+              }}
+              legends={[
+                {
+                  anchor: "bottom-right",
+                  direction: "column",
+                  justify: false,
+                  translateX: 100,
+                  translateY: 0,
+                  itemsSpacing: 0,
+                  itemWidth: 70,
+                  itemHeight: 18,
+                  itemTextColor: "#999",
+                  itemDirection: "left-to-right",
+                  itemOpacity: 1,
+                  symbolSize: 10,
+                  symbolShape: "circle",
+                  effects: [
+                    {
+                      on: "hover",
+                      style: {
+                        itemTextColor: "#000",
+                      },
+                    },
+                  ],
+                },
+              ]}
+              pointBorderWidth={1}
+              pointSize={16}
+              useMesh
+              xFormat="time:%Y-%m"
+              xScale={{
+                format: "%Y-%m-%d",
+                precision: "month",
+                type: "time",
+                useUTC: false,
+              }}
+              yScale={{
+                type: "linear",
+                stacked: false,
+                min: "auto",
+                max: "auto",
+              }}
+            />
+          </Box>
+        </HStack>
+      </Skeleton>
+
       <Skeleton
         isLoaded={!employeesLoading && !projectsLoading}
         borderRadius={20}
@@ -229,6 +369,7 @@ export default function Home() {
         <HStack marginTop={5}>
           <Stat
             borderWidth={2}
+            border={"InactiveBorder"}
             borderStyle={"dashed"}
             padding={2}
             borderRadius={10}
@@ -245,6 +386,7 @@ export default function Home() {
 
           <Stat
             borderWidth={2}
+            border={"InactiveBorder"}
             borderStyle={"dashed"}
             padding={2}
             borderRadius={10}
