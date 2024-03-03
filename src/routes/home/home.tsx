@@ -13,7 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { IGetStatistics, IGetStatisticsRes } from "../../types/statistics";
 import { IErrorResponse } from "../../types/common";
@@ -79,6 +79,11 @@ export default function Home() {
   const searchByCond = async () => {
     await refetch();
     setCurrentSelectedYear(year);
+  };
+
+  const changeYear = (event: ChangeEvent<HTMLInputElement>) => {
+    const isNumber = /^\d+$/.test(event.target.value);
+    if (isNumber) setYear(event.target.value);
   };
 
   useEffect(() => {
@@ -173,10 +178,10 @@ export default function Home() {
                 연도
               </Text>
               <Input
-                onChange={(event) => setYear(event.target.value)}
+                onChange={(event) => changeYear(event)}
                 placeholder={new Date().getFullYear().toString()}
                 size="sm"
-                type="text"
+                type={"text"}
                 value={year}
                 width={110}
                 focusBorderColor={primaryColor}
