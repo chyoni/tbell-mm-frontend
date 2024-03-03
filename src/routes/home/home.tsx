@@ -184,6 +184,7 @@ export default function Home() {
                 type={"text"}
                 value={year}
                 width={110}
+                maxLength={4}
                 focusBorderColor={primaryColor}
                 onKeyUp={handleKeyUp}
               />
