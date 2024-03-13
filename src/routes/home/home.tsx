@@ -136,8 +136,6 @@ export default function Home() {
     }
   }, [data, year]);
 
-  console.log(statisticsLineData);
-
   return (
     <>
       <Helmet>

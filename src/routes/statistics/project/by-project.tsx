@@ -46,6 +46,8 @@ import NoContent from "../../../components/no-content";
 import { convertLevelEnToKo } from "../../../utils";
 import { NumericFormat } from "react-number-format";
 import Pagination from "../../../components/pagination";
+import { IGetContractStatisticsRes } from "../../../types/statistics";
+import { getContractHistory } from "../../../api/statistics";
 
 export function getCopyEmployeeHistoryStateAndIndex(
   employeeHistory: IEmployeeHistory[],
@@ -109,6 +111,16 @@ export default function ByProjectStatistics() {
     queryKey: ["employeeHistory"],
     queryFn: () =>
       getEmployeeHistory(page, contractNumber, searchYear, searchEmployeeName),
+    enabled: contractNumber !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  const { isLoading: statisticsLoading, data: statisticsData } = useQuery<
+    IGetContractStatisticsRes,
+    IErrorResponse
+  >({
+    queryKey: ["statisticsByProject"],
+    queryFn: () => getContractHistory(contractNumber!, searchYear, true),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
   });
@@ -208,12 +220,6 @@ export default function ByProjectStatistics() {
       updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
         indexToUpdateManMonth
       ].calculatePrice;
-
-    console.log(
-      (plPrice && calculatePrice) ||
-        (!plPrice && calculatePrice) ||
-        (plPrice && !calculatePrice)
-    );
 
     // 변경할 mm 객체에 대해서 기존값은 그대로 두고 inputPrice의 값을 수정(추가)한다.
     updatedEmployeeHistory[indexToUpdateEmployeeHistory].mms[
@@ -434,7 +440,10 @@ export default function ByProjectStatistics() {
       <Helmet>
         <title>{`투입 현황 ${contractNumber}`}</title>
       </Helmet>
-      <Skeleton isLoaded={!projectLoading && !isLoading} height={"50vh"}>
+      <Skeleton
+        isLoaded={!projectLoading && !isLoading && !statisticsLoading}
+        height={"50vh"}
+      >
         {/* 화면 상단 타이틀 */}
         <HStack marginBottom={5}>
           <Button
@@ -456,6 +465,15 @@ export default function ByProjectStatistics() {
             <Text
               fontWeight={"hairline"}
             >{`${projectData?.data.endDate})`}</Text>
+          </HStack>
+          <HStack>
+            <Text>|</Text>
+            <HStack>
+              <Text fontWeight={"hairline"}>{`전체 투입 MM: `}</Text>
+              <Text>{statisticsData?.data[0].totalInputManMonth}</Text>
+              <Text fontWeight={"hairline"}>{`전체 정산 MM: `}</Text>
+              <Text>{statisticsData?.data[0].totalCalculateManMonth}</Text>
+            </HStack>
           </HStack>
         </HStack>
         {/* 화면 상단 타이틀 끝 */}
