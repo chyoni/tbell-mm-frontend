@@ -555,7 +555,7 @@ export default function Home() {
           </HStack>
 
           {/* 검색 섹션 */}
-          <HStack marginBottom={5} spacing={8}>
+          <HStack width={"100%"} marginBottom={5} spacing={8}>
             <Box width={"min-content"} alignItems={"center"} display={"flex"}>
               <Text
                 marginRight={2}
@@ -576,13 +576,9 @@ export default function Home() {
               />
             </Box>
 
-            <Box width={"50%"} alignItems={"center"} display={"flex"}>
-              <HStack p={2}>
-                <Text
-                  marginRight={2}
-                  fontWeight={"hairline"}
-                  width={"max-content"}
-                >
+            <Box width={"60%"} alignItems={"center"} display={"flex"}>
+              <HStack p={2} width={"100%"}>
+                <Text marginRight={2} fontWeight={"hairline"} width={"10%"}>
                   프로젝트
                 </Text>
                 <Select
@@ -594,6 +590,7 @@ export default function Home() {
                       borderWidth: 0,
                       borderBottomWidth: 1.5,
                       borderRadius: 1,
+                      minWidth: "500px",
                       display: "flex",
                       ":hover": {
                         borderColor: primaryColor,
