@@ -5,6 +5,10 @@ export interface IGetProjects extends IResponse {
   data: IGetData<IProject>;
 }
 
+export interface IGetProjectOptions extends IResponse {
+  data: IProject[];
+}
+
 export interface IGetProject extends IResponse {
   data: IProject;
 }

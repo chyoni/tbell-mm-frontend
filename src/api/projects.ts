@@ -24,6 +24,9 @@ export const getProjects = async (
     .then((res) => res.data);
 };
 
+export const getProjectsForOptions = async () =>
+  instance.get(`projects/options`).then((res) => res.data);
+
 export const getProject = async (
   contractNumber: string
 ): Promise<IGetProject> =>

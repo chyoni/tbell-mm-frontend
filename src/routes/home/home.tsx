@@ -15,20 +15,29 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { IGetStatistics, IGetStatisticsRes } from "../../types/statistics";
-import { IErrorResponse } from "../../types/common";
-import { getHistoryStatistics } from "../../api/statistics";
+import {
+  IGetContractStatistics,
+  IGetContractStatisticsRes,
+  IGetStatistics,
+  IGetStatisticsRes,
+} from "../../types/statistics";
+import Select, { ActionMeta, SingleValue } from "react-select";
+import { IErrorResponse, Option } from "../../types/common";
+import { getContractHistory, getHistoryStatistics } from "../../api/statistics";
 import { primaryColor, titleColor } from "../../theme";
 import { getKoreaDateTime } from "../../utils";
 import { NumericFormat } from "react-number-format";
 import { IGetEmployees } from "../../types/employee";
 import { getEmployees } from "../../api/employees";
-import { IGetProjects } from "../../types/project";
-import { getProjects } from "../../api/projects";
+import { IGetProjectOptions, IGetProjects } from "../../types/project";
+import { getProjects, getProjectsForOptions } from "../../api/projects";
 import { ResponsiveLine, Serie } from "@nivo/line";
 
 export default function Home() {
   const [year, setYear] = useState<string>(new Date().getFullYear().toString());
+  const [statisticsYear, setStatisticsYear] = useState<string>(
+    new Date().getFullYear().toString()
+  );
   const [currentSelectedYear, setCurrentSelectedYear] = useState<string>(
     new Date().getFullYear().toString()
   );
@@ -68,6 +77,46 @@ export default function Home() {
     refetchOnWindowFocus: false,
   });
 
+  const { isLoading: pOptionsLoading, data: pOptions } = useQuery<
+    IGetProjectOptions,
+    IErrorResponse
+  >({
+    queryKey: ["projectsOptions"],
+    queryFn: () => getProjectsForOptions(),
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (pOptions && pOptions.ok) {
+      const defaultOption = {
+        label: pOptions.data[0].teamName,
+        value: pOptions.data[0].contractNumber,
+      };
+      setContract(defaultOption);
+    }
+  }, [pOptions]);
+
+  const [contract, setContract] = useState<SingleValue<Option>>();
+
+  const onContractChange = (
+    newValue: SingleValue<Option>,
+    actionMeta: ActionMeta<Option>
+  ) => {
+    setContract(newValue);
+  };
+
+  const {
+    isLoading: contractStatisticsLoading,
+    data: contractStatisticsData,
+    refetch: contractStatisticsRefetch,
+  } = useQuery<IGetContractStatisticsRes, IErrorResponse>({
+    queryKey: ["statisticsByProjectTotal"],
+    queryFn: () => getContractHistory(contract?.value!, statisticsYear),
+    enabled: contract !== undefined,
+  });
+
+  const [cStatistics, setCStatistics] = useState<IGetContractStatistics[]>([]);
+
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
@@ -81,9 +130,18 @@ export default function Home() {
     setCurrentSelectedYear(year);
   };
 
+  const searchCStatistics = async () => {
+    await contractStatisticsRefetch();
+  };
+
   const changeYear = (event: ChangeEvent<HTMLInputElement>) => {
     const isNumber = /^\d+$/.test(event.target.value);
     if (isNumber) setYear(event.target.value);
+  };
+
+  const changeStatisticsYear = (event: ChangeEvent<HTMLInputElement>) => {
+    const isNumber = /^\d+$/.test(event.target.value);
+    if (isNumber) setStatisticsYear(event.target.value);
   };
 
   useEffect(() => {
@@ -136,6 +194,33 @@ export default function Home() {
     }
   }, [data, year]);
 
+  useEffect(() => {
+    if (contractStatisticsData && contractStatisticsData.ok) {
+      const cleanContractStatisticsData = [...contractStatisticsData.data];
+
+      for (let month = 1; month <= 12; month++) {
+        const existsMonth = cleanContractStatisticsData.findIndex(
+          (item) => item.month === month
+        );
+
+        if (existsMonth === -1) {
+          cleanContractStatisticsData.push({
+            month,
+            totalCalculateManMonth: null,
+            totalCalculatePrice: null,
+            totalInputManMonth: null,
+            totalInputPrice: null,
+            teamName: "",
+            contractNumber: "",
+          });
+        }
+      }
+
+      cleanContractStatisticsData.sort((prev, next) => prev.month - next.month);
+      setCStatistics(cleanContractStatisticsData);
+    }
+  }, [contractStatisticsData, statisticsYear]);
+
   return (
     <>
       <Helmet>
@@ -150,10 +235,10 @@ export default function Home() {
           marginTop={8}
           px={10}
           py={5}
-          border={"InactiveBorder"}
-          borderStyle={"dashed"}
+          borderStyle={"outset"}
+          borderColor={"Background"}
           borderRadius={20}
-          borderWidth={2}
+          borderWidth={1}
           direction={"column"}
         >
           <HStack justifyContent={"space-between"} marginBottom={3}>
@@ -263,10 +348,97 @@ export default function Home() {
             ))}
           </HStack>
           {/* 데이터 끝 */}
+
+          <Box height={"40vh"} w={"full"} padding={2} marginTop={4}>
+            <Flex justifyContent={"space-between"} marginBottom={3}>
+              <Text fontWeight={"bold"} fontSize={"sm"}>
+                {`${currentSelectedYear} 정산금액 추이도`}
+              </Text>
+              <Text fontSize={"sm"} color={"#C6C7C9"}>
+                {getKoreaDateTime()} 기준
+              </Text>
+            </Flex>
+            <ResponsiveLine
+              animate
+              motionConfig="wobbly"
+              enableArea
+              areaOpacity={0.07}
+              colors={["rgb(97, 205, 187)", "rgb(244, 117, 96)"]}
+              crosshairType="cross"
+              axisBottom={{
+                format: "%b",
+                legendOffset: -12,
+                tickValues: "every 1 months",
+              }}
+              curve="monotoneX"
+              data={[statisticsLineData]}
+              enablePointLabel
+              enableGridX={true}
+              margin={{
+                bottom: 60,
+                left: 80,
+                right: 150,
+                top: 20,
+              }}
+              pointBorderColor={{
+                from: "color",
+                modifiers: [["darker", 0.3]],
+              }}
+              theme={{
+                text: {
+                  fill: "#878d8c",
+                },
+                tooltip: {
+                  container: { color: "black" },
+                },
+              }}
+              legends={[
+                {
+                  anchor: "bottom-right",
+                  direction: "column",
+                  justify: false,
+                  translateX: 100,
+                  translateY: 0,
+                  itemsSpacing: 0,
+                  itemWidth: 70,
+                  itemHeight: 18,
+                  itemTextColor: "#999",
+                  itemDirection: "left-to-right",
+                  itemOpacity: 1,
+                  symbolSize: 10,
+                  symbolShape: "circle",
+                  effects: [
+                    {
+                      on: "hover",
+                      style: {
+                        itemTextColor: "#000",
+                      },
+                    },
+                  ],
+                },
+              ]}
+              pointBorderWidth={1}
+              pointSize={16}
+              useMesh
+              xFormat="time:%Y-%m"
+              xScale={{
+                format: "%Y-%m-%d",
+                precision: "month",
+                type: "time",
+                useUTC: false,
+              }}
+              yScale={{
+                type: "linear",
+                stacked: false,
+                min: "auto",
+                max: "auto",
+              }}
+            />
+          </Box>
         </VStack>
       </Skeleton>
 
-      <Skeleton isLoaded={!isLoading}>
+      {/* <Skeleton isLoaded={!isLoading}>
         <HStack>
           <Box
             height={"40vh"}
@@ -364,6 +536,181 @@ export default function Home() {
             />
           </Box>
         </HStack>
+      </Skeleton> */}
+
+      <Skeleton
+        isLoaded={!isLoading && !pOptionsLoading && !contractStatisticsLoading}
+        borderRadius={20}
+      >
+        <VStack
+          h={"max-content"}
+          marginTop={8}
+          px={10}
+          py={5}
+          borderStyle={"outset"}
+          borderColor={"Background"}
+          borderRadius={20}
+          borderWidth={1}
+          direction={"column"}
+        >
+          <HStack justifyContent={"space-between"} marginBottom={3}>
+            <Text fontWeight={"semibold"} fontSize={"sm"}>
+              프로젝트 별 공수율 현황
+            </Text>
+            <Text fontSize={"sm"} color={"#C6C7C9"}>
+              {getKoreaDateTime()} 기준
+            </Text>
+          </HStack>
+
+          {/* 검색 섹션 */}
+          <HStack marginBottom={5} spacing={8}>
+            <Box width={"min-content"} alignItems={"center"} display={"flex"}>
+              <Text
+                marginRight={2}
+                fontWeight={"hairline"}
+                width={"max-content"}
+              >
+                연도
+              </Text>
+              <Input
+                onChange={(event) => changeStatisticsYear(event)}
+                placeholder={new Date().getFullYear().toString()}
+                size="sm"
+                type={"text"}
+                value={statisticsYear}
+                width={110}
+                maxLength={4}
+                focusBorderColor={primaryColor}
+              />
+            </Box>
+
+            <Box width={"50%"} alignItems={"center"} display={"flex"}>
+              <HStack p={2}>
+                <Text
+                  marginRight={2}
+                  fontWeight={"hairline"}
+                  width={"max-content"}
+                >
+                  프로젝트
+                </Text>
+                <Select
+                  placeholder={"SK텔레콤 1팀"}
+                  styles={{
+                    control: (styles, props) => ({
+                      backgroundColor: "none",
+                      borderColor: "none",
+                      borderWidth: 0,
+                      borderBottomWidth: 1.5,
+                      borderRadius: 1,
+                      display: "flex",
+                      ":hover": {
+                        borderColor: primaryColor,
+                      },
+                    }),
+                    option: (styles, props) => ({
+                      ...styles,
+                      color: "black",
+                      backgroundColor: props.isSelected
+                        ? primaryColor
+                        : undefined,
+                      ":hover": {
+                        backgroundColor: props.isSelected
+                          ? undefined
+                          : "#edede9",
+                      },
+                    }),
+                    singleValue: (styles, props) => ({
+                      ...styles,
+                      color: primaryColor,
+                    }),
+                    input: (styles, props) => ({
+                      ...styles,
+                      color: primaryColor,
+                    }),
+                  }}
+                  name={"project"}
+                  options={pOptions?.data.map((opt) => {
+                    return { label: opt.teamName, value: opt.contractNumber };
+                  })}
+                  value={contract}
+                  onChange={onContractChange}
+                  closeMenuOnSelect={true}
+                />
+              </HStack>
+            </Box>
+
+            <Button colorScheme="teal" size={"sm"} onClick={searchCStatistics}>
+              검색
+            </Button>
+          </HStack>
+          {/* 검색 섹션 끝 */}
+
+          {/* 데이터 */}
+          <HStack>
+            <Flex direction={"column"} marginRight={10}>
+              <Flex alignItems={"center"} justifyContent={"center"}>
+                <Text fontWeight={"bold"} fontSize={"large"}>
+                  구분
+                </Text>
+              </Flex>
+              <Box>
+                <Text color={titleColor}>투입MM</Text>
+              </Box>
+              <Box>
+                <Text color={titleColor}>투입금액</Text>
+              </Box>
+              <Box>
+                <Text color={titleColor}>정산MM</Text>
+              </Box>
+              <Box>
+                <Text color={titleColor}>정산금액</Text>
+              </Box>
+            </Flex>
+            {cStatistics?.map((s, index) => (
+              <Flex direction={"column"} key={index} marginRight={6}>
+                <Flex alignItems={"center"} justifyContent={"center"}>
+                  <Text
+                    fontWeight={"bold"}
+                    fontSize={"large"}
+                  >{`${s.month}월`}</Text>
+                </Flex>
+                <Flex alignItems={"center"} justifyContent={"center"}>
+                  <Text fontWeight={"hairline"}>
+                    {s.totalInputManMonth !== null ? s.totalInputManMonth : "-"}
+                  </Text>
+                </Flex>
+                <Flex alignItems={"center"} justifyContent={"center"}>
+                  <NumericFormat
+                    value={s.totalInputPrice !== null ? s.totalInputPrice : "-"}
+                    displayType="text"
+                    thousandSeparator={","}
+                    className="text-md font-thin"
+                  />
+                </Flex>
+                <Flex alignItems={"center"} justifyContent={"center"}>
+                  <Text fontWeight={"hairline"}>
+                    {s.totalCalculateManMonth !== null
+                      ? s.totalCalculateManMonth
+                      : "-"}
+                  </Text>
+                </Flex>
+                <Flex alignItems={"center"} justifyContent={"center"}>
+                  <NumericFormat
+                    value={
+                      s.totalCalculatePrice !== null
+                        ? s.totalCalculatePrice
+                        : "-"
+                    }
+                    displayType="text"
+                    thousandSeparator={","}
+                    className="text-md font-thin"
+                  />
+                </Flex>
+              </Flex>
+            ))}
+          </HStack>
+          {/* 데이터 끝 */}
+        </VStack>
       </Skeleton>
 
       <Skeleton
@@ -372,11 +719,11 @@ export default function Home() {
       >
         <HStack marginTop={5}>
           <Stat
-            borderWidth={2}
-            border={"InactiveBorder"}
-            borderStyle={"dashed"}
+            borderStyle={"outset"}
+            borderColor={"Background"}
+            borderRadius={20}
+            borderWidth={1}
             padding={2}
-            borderRadius={10}
             width={"min-content"}
           >
             <StatLabel>사원 수</StatLabel>
@@ -389,11 +736,11 @@ export default function Home() {
           </Stat>
 
           <Stat
-            borderWidth={2}
-            border={"InactiveBorder"}
-            borderStyle={"dashed"}
+            borderStyle={"outset"}
+            borderColor={"Background"}
+            borderRadius={20}
+            borderWidth={1}
             padding={2}
-            borderRadius={10}
             width={"min-content"}
           >
             <StatLabel>프로젝트 수</StatLabel>
