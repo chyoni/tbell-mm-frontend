@@ -55,8 +55,6 @@ export default function Home() {
   >({
     queryKey: ["statistics"],
     queryFn: () => getHistoryStatistics(year),
-    refetchOnWindowFocus: false,
-    refetchInterval: 300000,
   });
 
   const { isLoading: employeesLoading, data: employeesData } = useQuery<
@@ -65,7 +63,6 @@ export default function Home() {
   >({
     queryKey: ["employees"],
     queryFn: () => getEmployees(0, 10),
-    refetchOnWindowFocus: false,
   });
 
   const { isLoading: projectsLoading, data: projectsData } = useQuery<
@@ -74,7 +71,6 @@ export default function Home() {
   >({
     queryKey: ["projects"],
     queryFn: () => getProjects(0, 10),
-    refetchOnWindowFocus: false,
   });
 
   const { isLoading: pOptionsLoading, data: pOptions } = useQuery<
