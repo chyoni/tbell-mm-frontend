@@ -83,7 +83,6 @@ export default function Home() {
   >({
     queryKey: ["projectsOptions"],
     queryFn: () => getProjectsForOptions(),
-    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -350,12 +349,9 @@ export default function Home() {
           {/* 데이터 끝 */}
 
           <Box height={"40vh"} w={"full"} padding={2} marginTop={4}>
-            <Flex justifyContent={"space-between"} marginBottom={3}>
+            <Flex justifyContent={"center"} marginBottom={3}>
               <Text fontWeight={"bold"} fontSize={"sm"}>
                 {`${currentSelectedYear} 정산금액 추이도`}
-              </Text>
-              <Text fontSize={"sm"} color={"#C6C7C9"}>
-                {getKoreaDateTime()} 기준
               </Text>
             </Flex>
             <ResponsiveLine
