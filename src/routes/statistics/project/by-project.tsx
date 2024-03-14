@@ -108,7 +108,7 @@ export default function ByProjectStatistics() {
     IGetEmployeeHistories,
     IErrorResponse
   >({
-    queryKey: ["employeeHistory"],
+    queryKey: ["employeeHistory", page],
     queryFn: () =>
       getEmployeeHistory(page, contractNumber, searchYear, searchEmployeeName),
     enabled: contractNumber !== undefined,
@@ -458,13 +458,17 @@ export default function ByProjectStatistics() {
             {`[${projectData?.data.teamName}] 투입 현황`}
           </Text>
           <HStack>
-            <Text
-              fontWeight={"hairline"}
-            >{`(${projectData?.data.startDate}`}</Text>
+            <Text fontWeight={"hairline"}>
+              {projectData?.data.startDate
+                ? `(${projectData?.data.startDate}`
+                : `(미정`}
+            </Text>
             <Text fontWeight={"hairline"}>-</Text>
-            <Text
-              fontWeight={"hairline"}
-            >{`${projectData?.data.endDate})`}</Text>
+            <Text fontWeight={"hairline"}>
+              {projectData?.data.endDate
+                ? `${projectData?.data.endDate})`
+                : `미정)`}
+            </Text>
           </HStack>
           <HStack>
             <Text>|</Text>

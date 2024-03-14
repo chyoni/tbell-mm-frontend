@@ -44,8 +44,10 @@ export default function Pagination({
   const lastPage = totalPages;
   // total < 10 ? 0 : total % 10 === 0 ? total / 10 : Math.floor(total / 10 + 1);
   const toast = useToast();
+  let viewPage = page + 1;
 
   const handleNavigatePage = (valueAsString: string) => {
+    console.log(valueAsString);
     if (valueAsString === "") return;
     if (lastPage < +valueAsString) {
       toast({
@@ -62,6 +64,7 @@ export default function Pagination({
 
   return (
     <Flex justifyContent={"space-between"}>
+      {/* << < 버튼 */}
       <HStack spacing={"2"}>
         <IconButton
           size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
@@ -81,6 +84,7 @@ export default function Pagination({
         />
       </HStack>
 
+      {/* 가운데 번호 버튼 */}
       <HStack mx={1}>
         {lastPage !== 0 && page + 1 !== lastPage && (
           <Button
@@ -90,7 +94,7 @@ export default function Pagination({
             colorScheme={"teal"}
             variant={page + 1 === lastPage ? "outline" : "solid"}
           >
-            {page + 1}
+            {viewPage}
           </Button>
         )}
         <Icon as={FaEllipsis} w={10} h={5} />
@@ -106,7 +110,7 @@ export default function Pagination({
           </Button>
         )}
 
-        {lastPage !== 0 && (
+        {/* {lastPage !== 0 && (
           <HStack>
             <Text
               display={{
@@ -121,7 +125,7 @@ export default function Pagination({
             </Text>
             <NumberInput
               onChange={handleNavigatePage}
-              value={page + 1}
+              value={page}
               min={1}
               max={lastPage}
               clampValueOnBlur={false}
@@ -135,9 +139,10 @@ export default function Pagination({
               </NumberInputStepper>
             </NumberInput>
           </HStack>
-        )}
+        )} */}
       </HStack>
 
+      {/* >> > 버튼 */}
       <HStack>
         <IconButton
           size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}

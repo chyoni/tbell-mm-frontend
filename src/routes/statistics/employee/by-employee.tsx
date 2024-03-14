@@ -69,7 +69,7 @@ export default function ByEmployeeStatistics() {
     IGetEmployeeHistories,
     IErrorResponse
   >({
-    queryKey: ["employeeHistory"],
+    queryKey: ["employeeHistory", page],
     queryFn: () =>
       getEmployeeHistory(page, undefined, searchYear, employeeName),
     enabled: employeeName !== undefined,

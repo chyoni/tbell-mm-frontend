@@ -48,7 +48,7 @@ export default function ProjectStatisticsList() {
   const searchByCond = async () => await refetch();
 
   const { isLoading, data, refetch } = useQuery<IGetProjects, Error>({
-    queryKey: ["projects"],
+    queryKey: ["projects", page],
     queryFn: () => getProjects(page, 10, undefined, searchTeamName),
   });
 

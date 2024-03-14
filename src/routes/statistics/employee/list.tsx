@@ -40,7 +40,7 @@ export default function EmployeeStatisticsList() {
   const goToSpecificPage = (page: number) => setPage(page);
 
   const { isLoading, data, refetch } = useQuery<IGetEmployees, IErrorResponse>({
-    queryKey: ["employees"],
+    queryKey: ["employees", page],
     queryFn: () => getEmployees(page, 10, employeeName),
     refetchOnWindowFocus: true,
   });
