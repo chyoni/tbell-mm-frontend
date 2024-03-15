@@ -86,6 +86,7 @@ export default function Pagination({
 
       {/* 가운데 번호 버튼 */}
       <HStack mx={1}>
+        {/* 현재 번호 */}
         {lastPage !== 0 && page + 1 !== lastPage && (
           <Button
             size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
@@ -95,6 +96,17 @@ export default function Pagination({
             variant={page + 1 === lastPage ? "outline" : "solid"}
           >
             {viewPage}
+          </Button>
+        )}
+        {/* 첫 페이지 버튼 */}
+        {lastPage !== 0 && page + 1 === lastPage && (
+          <Button
+            size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+            onClick={goToFirstPage}
+            colorScheme={"teal"}
+            variant={page + 1 === lastPage ? "outline" : "solid"}
+          >
+            {1}
           </Button>
         )}
         <Icon as={FaEllipsis} w={10} h={5} />
