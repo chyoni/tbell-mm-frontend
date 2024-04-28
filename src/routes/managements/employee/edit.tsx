@@ -168,7 +168,7 @@ export default function EmployeeEdit() {
                     isRequired
                     isInvalid={isStartDateError}
                   >
-                    <FormLabel>시작일</FormLabel>
+                    <FormLabel>입사일</FormLabel>
                     <Input
                       size="md"
                       type="date"
@@ -182,7 +182,7 @@ export default function EmployeeEdit() {
                   </FormControl>
 
                   <FormControl marginTop={2}>
-                    <FormLabel>종료일</FormLabel>
+                    <FormLabel>퇴사일</FormLabel>
                     <Input
                       size="md"
                       type="date"
