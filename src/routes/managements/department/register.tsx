@@ -69,7 +69,7 @@ export default function DepartmentRegister() {
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={'semibold'} fontSize={'2xl'}>
-          프로젝트 등록
+          부서 등록
         </Text>
       </Box>
       <HStack justifyContent={'space-between'}>
