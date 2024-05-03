@@ -4,23 +4,16 @@ import {
   HStack,
   Icon,
   IconButton,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Text,
   useToast,
-} from "@chakra-ui/react";
-import React from "react";
+} from '@chakra-ui/react';
+import React from 'react';
 import {
   FaAngleLeft,
   FaAngleRight,
   FaAnglesLeft,
   FaAnglesRight,
   FaEllipsis,
-} from "react-icons/fa6";
-import { primaryColor } from "../theme";
+} from 'react-icons/fa6';
 
 interface IPagination {
   page: number;
@@ -48,12 +41,12 @@ export default function Pagination({
 
   const handleNavigatePage = (valueAsString: string) => {
     console.log(valueAsString);
-    if (valueAsString === "") return;
+    if (valueAsString === '') return;
     if (lastPage < +valueAsString) {
       toast({
         title: `마지막 페이지는 ${lastPage} 페이지 입니다.`,
-        description: "페이지 번호를 마지막 페이지보다 낮거나 같게 설정하세요.",
-        status: "info",
+        description: '페이지 번호를 마지막 페이지보다 낮거나 같게 설정하세요.',
+        status: 'info',
         duration: 3000,
         isClosable: true,
       });
@@ -63,23 +56,23 @@ export default function Pagination({
   };
 
   return (
-    <Flex justifyContent={"space-between"}>
+    <Flex justifyContent={'space-between'}>
       {/* << < 버튼 */}
-      <HStack spacing={"2"}>
+      <HStack spacing={'2'}>
         <IconButton
-          size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+          size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
           isDisabled={page === 0}
           colorScheme="teal"
           onClick={goToFirstPage}
-          aria-label={"First Page"}
+          aria-label={'First Page'}
           icon={<FaAnglesLeft />}
         />
         <IconButton
-          size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+          size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
           isDisabled={page === 0}
           colorScheme="teal"
           onClick={goToPrevPage}
-          aria-label={"Prev Page"}
+          aria-label={'Prev Page'}
           icon={<FaAngleLeft />}
         />
       </HStack>
@@ -89,11 +82,11 @@ export default function Pagination({
         {/* 현재 번호 */}
         {lastPage !== 0 && page + 1 !== lastPage && (
           <Button
-            size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+            size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
             isDisabled={page !== lastPage}
             onClick={goToPrevPage}
-            colorScheme={"teal"}
-            variant={page + 1 === lastPage ? "outline" : "solid"}
+            colorScheme={'teal'}
+            variant={page + 1 === lastPage ? 'outline' : 'solid'}
           >
             {viewPage}
           </Button>
@@ -101,10 +94,10 @@ export default function Pagination({
         {/* 첫 페이지 버튼 */}
         {lastPage !== 0 && page + 1 === lastPage && (
           <Button
-            size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+            size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
             onClick={goToFirstPage}
-            colorScheme={"teal"}
-            variant={page + 1 === lastPage ? "outline" : "solid"}
+            colorScheme={'teal'}
+            variant={page + 1 === lastPage ? 'outline' : 'solid'}
           >
             {1}
           </Button>
@@ -112,11 +105,11 @@ export default function Pagination({
         <Icon as={FaEllipsis} w={10} h={5} />
         {lastPage !== 0 && (
           <Button
-            size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+            size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
             isDisabled={page + 1 === lastPage || lastPage === 0}
             onClick={() => goToLastPage(lastPage - 1)}
-            colorScheme={"teal"}
-            variant={page + 1 === lastPage ? "solid" : "outline"}
+            colorScheme={'teal'}
+            variant={page + 1 === lastPage ? 'solid' : 'outline'}
           >
             {lastPage}
           </Button>
@@ -157,18 +150,18 @@ export default function Pagination({
       {/* >> > 버튼 */}
       <HStack>
         <IconButton
-          size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+          size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
           isDisabled={lastPage === 0 || page + 1 === lastPage}
           onClick={goToNextPage}
-          aria-label={"Next Page"}
+          aria-label={'Next Page'}
           colorScheme="teal"
           icon={<FaAngleRight />}
         />
         <IconButton
-          size={{ sm: "xs", md: "xs", lg: "xs", "2xl": "md" }}
+          size={{ sm: 'xs', md: 'xs', lg: 'xs', '2xl': 'md' }}
           isDisabled={lastPage === 0 || page + 1 === lastPage}
           onClick={() => goToLastPage(lastPage - 1)}
-          aria-label={"Last Page"}
+          aria-label={'Last Page'}
           colorScheme="teal"
           icon={<FaAnglesRight />}
         />

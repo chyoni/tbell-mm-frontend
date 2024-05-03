@@ -4,8 +4,8 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { logAdminIn } from "../api/auth";
+} from 'react';
+import { logAdminIn } from '../api/auth';
 
 interface IAuthContext {
   token: string | null;
@@ -33,19 +33,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const jwt = localStorage.getItem("token");
+    const jwt = localStorage.getItem('token');
     if (jwt) {
       setToken(jwt);
     }
   }, []);
 
   const login = async (userData: ILoginData) => {
-    const res = await logAdminIn(userData.username, userData.password);
-    console.log(res);
+    const responseBody = await logAdminIn(userData.username, userData.password);
+
+    const accessTokenKeyValue = responseBody.split(';')[0];
+    const refreshTokenKeyValue = responseBody.split(';')[1];
+
+    const accessToken = accessTokenKeyValue.split('=')[1];
+    const refreshToken = refreshTokenKeyValue.split('=')[1];
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     setToken(null);
   };
 
