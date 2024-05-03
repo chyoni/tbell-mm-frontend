@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider } from "react-router-dom";
 import router from "./router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./context/auth-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,7 +20,9 @@ root.render(
     <ChakraProvider theme={theme}>
       <ColorModeScript initialColorMode={theme.config.initialMode} />
       <HelmetProvider>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </HelmetProvider>
     </ChakraProvider>
   </QueryClientProvider>

@@ -17,76 +17,82 @@ import ProjectStatisticsAddEmployee from "./routes/statistics/project/add-employ
 import ByProjectStatistics from "./routes/statistics/project/by-project";
 import ByEmployeeStatistics from "./routes/statistics/employee/by-employee";
 import EmployeeStatisticsList from "./routes/statistics/employee/list";
+import AuthWrapper from "./components/auth-wrapper";
 
 const router = createBrowserRouter([
   {
     path: "/mms",
-    element: <Root />,
+    element: <AuthWrapper />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "",
-        element: <Home />,
-      },
-      {
-        path: "statistics/projects",
-        element: <ProjectStatisticsList />,
-      },
-      {
-        path: "statistics/projects/:contractNumber",
-        element: <ByProjectStatistics />,
-      },
-      {
-        path: "statistics/projects/:contractNumber/employee",
-        element: <ProjectStatisticsAddEmployee />,
-      },
-      {
-        path: "statistics/employees",
-        element: <EmployeeStatisticsList />,
-      },
-      {
-        path: "statistics/employees/:employeeName",
-        element: <ByEmployeeStatistics />,
-      },
-      {
-        path: "departments",
-        element: <Departments />,
-      },
-      {
-        path: "departments/register",
-        element: <DepartmentRegister />,
-      },
-      {
-        path: "departments/edit/:departmentName",
-        element: <DepartmentEdit />,
-      },
-      {
-        path: "projects",
-        element: <Projects />,
-      },
-      {
-        path: "projects/register",
-        element: <ProjectRegister />,
-      },
-      {
-        path: "projects/edit/:contractNumber",
-        element: <ProjectEdit />,
-      },
-      {
-        path: "projects/details/:contractNumber",
-        element: <ProjectDetails />,
-      },
-      {
-        path: "employees",
-        element: <Employees />,
-      },
-      {
-        path: "employees/register",
-        element: <EmployeeRegister />,
-      },
-      {
-        path: "employees/edit/:employeeNumber",
-        element: <EmployeeEdit />,
+        element: <Root />,
+        children: [
+          {
+            path: "",
+            element: <Home />,
+          },
+          {
+            path: "statistics/projects",
+            element: <ProjectStatisticsList />,
+          },
+          {
+            path: "statistics/projects/:contractNumber",
+            element: <ByProjectStatistics />,
+          },
+          {
+            path: "statistics/projects/:contractNumber/employee",
+            element: <ProjectStatisticsAddEmployee />,
+          },
+          {
+            path: "statistics/employees",
+            element: <EmployeeStatisticsList />,
+          },
+          {
+            path: "statistics/employees/:employeeName",
+            element: <ByEmployeeStatistics />,
+          },
+          {
+            path: "departments",
+            element: <Departments />,
+          },
+          {
+            path: "departments/register",
+            element: <DepartmentRegister />,
+          },
+          {
+            path: "departments/edit/:departmentName",
+            element: <DepartmentEdit />,
+          },
+          {
+            path: "projects",
+            element: <Projects />,
+          },
+          {
+            path: "projects/register",
+            element: <ProjectRegister />,
+          },
+          {
+            path: "projects/edit/:contractNumber",
+            element: <ProjectEdit />,
+          },
+          {
+            path: "projects/details/:contractNumber",
+            element: <ProjectDetails />,
+          },
+          {
+            path: "employees",
+            element: <Employees />,
+          },
+          {
+            path: "employees/register",
+            element: <EmployeeRegister />,
+          },
+          {
+            path: "employees/edit/:employeeNumber",
+            element: <EmployeeEdit />,
+          },
+        ],
       },
     ],
   },
