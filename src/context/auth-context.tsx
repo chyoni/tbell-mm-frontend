@@ -13,6 +13,7 @@ interface IAuthContext {
   refreshToken: string | null;
   login: (userData: ILoginData) => Promise<HttpStatusCode>;
   logout: () => void;
+  refreshTokenUpdate: (refresh: string) => void;
 }
 
 interface ILoginData {
@@ -28,6 +29,7 @@ const AuthContext = createContext<IAuthContext>({
     return Promise.resolve(HttpStatusCode.Ok);
   },
   logout() {},
+  refreshTokenUpdate(refresh) {},
 });
 
 // Context를 사용하기 쉽게 하는 Custom Hook
@@ -60,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const refresh = refreshTokenKeyValue.split('=')[1];
 
     localStorage.setItem('token', access);
+    localStorage.setItem('refreshToken', refresh);
 
     setAccessToken(access);
     setRefreshToken(refresh);
@@ -73,8 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRefreshToken(null);
   };
 
+  const refreshTokenUpdate = (refresh: string) => {
+    setRefreshToken(refresh);
+  };
+
   return (
-    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout }}>
+    <AuthContext.Provider
+      value={{ accessToken, refreshToken, login, logout, refreshTokenUpdate }}
+    >
       {children}
     </AuthContext.Provider>
   );
