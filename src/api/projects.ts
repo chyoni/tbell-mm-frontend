@@ -1,45 +1,62 @@
+import { access } from 'fs';
 import {
   ICUDProjectResponse,
   IGetProject,
   IGetProjects,
   IUnitPrice,
-} from "../types/project";
-import { instance } from "./instance";
+} from '../types/project';
+import { instance } from './instance';
 
 export const getProjects = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   page: number,
   size: number,
   year?: string,
   teamName?: string
 ): Promise<IGetProjects> => {
   return instance
-    .get("projects", {
+    .get('projects', {
+      headers: { 'Access-Token': accessToken },
       params: {
         page,
         size,
-        ...(year !== undefined && year !== "" && { year }),
-        ...(teamName !== undefined && teamName !== "" && { teamName }),
+        ...(year !== undefined && year !== '' && { year }),
+        ...(teamName !== undefined && teamName !== '' && { teamName }),
       },
     })
     .then((res) => res.data);
 };
 
-export const getProjectsForOptions = async () =>
-  instance.get(`projects/options`).then((res) => res.data);
+export const getProjectsForOptions = async (
+  accessToken: string | null,
+  refreshToken: string | null
+) =>
+  instance
+    .get(`projects/options`, { headers: { 'Access-Token': accessToken } })
+    .then((res) => res.data);
 
 export const getProject = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   contractNumber: string
 ): Promise<IGetProject> =>
-  instance.get(`projects/${contractNumber}`).then((res) => res.data);
+  instance
+    .get(`projects/${contractNumber}`, {
+      headers: { 'Access-Token': accessToken },
+    })
+    .then((res) => res.data);
 
 export const editProject = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   contractNumber: string,
   teamName?: string,
   contractor?: string,
   startDate?: string,
   endDate?: string,
-  projectStatus?: "YEAR" | "SINGLE",
-  operationRate?: "INCLUDE" | "EXCEPT",
+  projectStatus?: 'YEAR' | 'SINGLE',
+  operationRate?: 'INCLUDE' | 'EXCEPT',
   departmentName?: string,
   unitPrices?: IUnitPrice[]
 ): Promise<ICUDProjectResponse> =>
@@ -57,18 +74,25 @@ export const editProject = async (
         ...(departmentName !== undefined && { departmentName }),
         ...(unitPrices !== undefined && { unitPrices }),
       },
-      { headers: { "Content-Type": "application/json" } }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Token': accessToken,
+        },
+      }
     )
     .then((res) => res.data);
 
 export const createProject = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   contractNumber: string,
   teamName: string,
   contractor: string,
   startDate: string,
   endDate: string,
-  projectStatus: "YEAR" | "SINGLE",
-  operationRate: "INCLUDE" | "EXCEPT",
+  projectStatus: 'YEAR' | 'SINGLE',
+  operationRate: 'INCLUDE' | 'EXCEPT',
   departmentName: string,
   unitPrices: IUnitPrice[]
 ): Promise<ICUDProjectResponse> =>
@@ -86,11 +110,22 @@ export const createProject = async (
         departmentName,
         unitPrices,
       },
-      { headers: { "Content-Type": "application/json" } }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Token': accessToken,
+        },
+      }
     )
     .then((res) => res.data);
 
 export const deleteProject = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   contractNumber: string
 ): Promise<ICUDProjectResponse> =>
-  instance.delete(`projects/${contractNumber}`).then((res) => res.data);
+  instance
+    .delete(`projects/${contractNumber}`, {
+      headers: { 'Access-Token': accessToken },
+    })
+    .then((res) => res.data);

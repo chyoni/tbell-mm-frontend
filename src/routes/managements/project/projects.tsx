@@ -23,30 +23,33 @@ import {
   Tr,
   useDisclosure,
   useToast,
-} from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
-import { deleteProject, getProjects } from "../../../api/projects";
-import { ICUDProjectResponse, IGetProjects } from "../../../types/project";
-import { primaryColor } from "../../../theme";
-import Pagination from "../../../components/pagination";
-import { IErrorResponse } from "../../../types/common";
+} from '@chakra-ui/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import { deleteProject, getProjects } from '../../../api/projects';
+import { ICUDProjectResponse, IGetProjects } from '../../../types/project';
+import { primaryColor } from '../../../theme';
+import Pagination from '../../../components/pagination';
+import { IErrorResponse } from '../../../types/common';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function Projects() {
+  const { accessToken, refreshToken } = useAuth();
   const toast = useToast();
 
   const [page, setPage] = useState<number>(0);
-  const [year, setYear] = useState<string | undefined>("");
-  const [teamName, setTeamName] = useState<string | undefined>("");
+  const [year, setYear] = useState<string | undefined>('');
+  const [teamName, setTeamName] = useState<string | undefined>('');
 
   // year 또는 teamName을 state로 관리하고 있을 때 그 값이 변경될 때 즉시(onChangeEvent) 이 쿼리를 다시 패치하고 싶으면 queryKey의 배열안에 year랑 teamName을 넣으면 된다.
   // 그럼 state가 변하면 당연히 변한 상태에 따라 쿼리를 다시 실행하게 되는것은 합리적이다. 근데 만약, 상태로 관리하지만 내가 딱 입력을 다하고 특정 시점에 이 쿼리를 다시 패치 하고 싶다면 (clickEvent)
   // queryKey는 그 state를 넣지말고 실행하는 API Function에만 아래처럼 파라미터로 던진다음에 click event에 refetch를 실행해주면 된다.
   const { isLoading, data, refetch } = useQuery<IGetProjects, Error>({
-    queryKey: ["projects", page],
-    queryFn: () => getProjects(page, 10, year, teamName),
+    queryKey: ['projects', page],
+    queryFn: () =>
+      getProjects(accessToken, refreshToken, page, 10, year, teamName),
   });
 
   // 첫번째 페이지 Function
@@ -65,7 +68,7 @@ export default function Projects() {
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>
   ) => {
-    if (e.key === "Enter") searchByCond();
+    if (e.key === 'Enter') searchByCond();
   };
 
   const {
@@ -74,14 +77,15 @@ export default function Projects() {
     onClose: onDeleteClose,
   } = useDisclosure();
 
-  const [deleteContractNumber, setDeleteContractNumber] = useState<string>("");
+  const [deleteContractNumber, setDeleteContractNumber] = useState<string>('');
 
   const deleteMutation = useMutation<ICUDProjectResponse, IErrorResponse>({
-    mutationFn: () => deleteProject(deleteContractNumber),
+    mutationFn: () =>
+      deleteProject(accessToken, refreshToken, deleteContractNumber),
     onSuccess: () => {
       toast({
         title: `삭제 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -96,7 +100,7 @@ export default function Projects() {
       toast({
         title: `삭제 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -104,7 +108,7 @@ export default function Projects() {
   });
 
   const onDeleteProject = () => {
-    if (deleteContractNumber === "" || deleteContractNumber === undefined)
+    if (deleteContractNumber === '' || deleteContractNumber === undefined)
       return;
     deleteMutation.mutate();
   };
@@ -115,13 +119,13 @@ export default function Projects() {
         <title>프로젝트 리스트</title>
       </Helmet>
       <Box marginBottom={5}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
           프로젝트 리스트
         </Text>
       </Box>
       <HStack marginBottom={5} spacing={8}>
-        <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
+        <Box width={'min-content'} alignItems={'center'} display={'flex'}>
+          <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
             연도 (시작일 기준)
           </Text>
           <Input
@@ -135,8 +139,8 @@ export default function Projects() {
             onKeyUp={handleKeyUp}
           />
         </Box>
-        <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
+        <Box width={'min-content'} alignItems={'center'} display={'flex'}>
+          <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
             팀명
           </Text>
           <Input
@@ -152,7 +156,7 @@ export default function Projects() {
         </Box>
         <Button
           colorScheme="teal"
-          size={"sm"}
+          size={'sm'}
           onClick={searchByCond}
           onKeyUp={handleKeyUp}
         >
@@ -161,23 +165,23 @@ export default function Projects() {
       </HStack>
       <Skeleton
         isLoaded={!isLoading}
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
         speed={5}
       >
         {data && data.errorMessage && (
           <Center>
-            <Text fontSize={"xx-large"} fontWeight={600}>
+            <Text fontSize={'xx-large'} fontWeight={600}>
               Oops!
             </Text>
-            <Text mt={2} fontSize={"large"}>
+            <Text mt={2} fontSize={'large'}>
               {data.errorMessage}
             </Text>
           </Center>
         )}
         {data && data.ok && (
           <TableContainer>
-            <Table size={"sm"}>
+            <Table size={'sm'}>
               <TableCaption>
                 <Pagination
                   totalPages={data.data.totalPages}
@@ -204,27 +208,27 @@ export default function Projects() {
               <Tbody>
                 {data?.data.content.map((p, index) => (
                   <Tr key={index}>
-                    <Td w={"15%"}>{p.contractNumber}</Td>
-                    <Td w={"15%"}>{p.departmentName}</Td>
-                    <Td w={"15%"}>{p.teamName}</Td>
-                    <Td w={"15%"}>
-                      {p.projectStatus === "YEAR" ? "연간" : "단건"}
+                    <Td w={'15%'}>{p.contractNumber}</Td>
+                    <Td w={'15%'}>{p.departmentName}</Td>
+                    <Td w={'15%'}>{p.teamName}</Td>
+                    <Td w={'15%'}>
+                      {p.projectStatus === 'YEAR' ? '연간' : '단건'}
                     </Td>
-                    <Td w={"15%"}>{p.startDate}</Td>
-                    <Td w={"15%"}>{p.endDate}</Td>
-                    <Td w={"10%"}>{p.contractor}</Td>
+                    <Td w={'15%'}>{p.startDate}</Td>
+                    <Td w={'15%'}>{p.endDate}</Td>
+                    <Td w={'10%'}>{p.contractor}</Td>
                     <Td>
                       <HStack spacing={2}>
-                        <Button size={"xs"} colorScheme="teal">
+                        <Button size={'xs'} colorScheme="teal">
                           <Link to={`details/${p.contractNumber}`}>
                             세부 정보
                           </Link>
                         </Button>
-                        <Button size={"xs"} colorScheme="teal">
+                        <Button size={'xs'} colorScheme="teal">
                           <Link to={`edit/${p.contractNumber}`}>수정</Link>
                         </Button>
                         <Button
-                          size={"xs"}
+                          size={'xs'}
                           colorScheme="red"
                           onClick={() => {
                             onDeleteToggle();
@@ -233,14 +237,14 @@ export default function Projects() {
                         >
                           삭제
                         </Button>
-                        <Button size={"xs"} colorScheme={"messenger"}>
+                        <Button size={'xs'} colorScheme={'messenger'}>
                           <Link
                             to={`/mms/statistics/projects/${p.contractNumber}`}
                           >
                             투입 현황
                           </Link>
                         </Button>
-                        <Button size={"xs"} colorScheme={"messenger"}>
+                        <Button size={'xs'} colorScheme={'messenger'}>
                           <Link
                             to={`/mms/statistics/projects/${p.contractNumber}/employee`}
                           >
@@ -258,7 +262,7 @@ export default function Projects() {
                             </ModalBody>
                             <ModalFooter>
                               <Button
-                                variant={"outline"}
+                                variant={'outline'}
                                 mr={3}
                                 onClick={onDeleteClose}
                               >

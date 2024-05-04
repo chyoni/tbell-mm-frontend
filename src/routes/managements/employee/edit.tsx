@@ -23,15 +23,18 @@ import {
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
 import { primaryColor } from '../../../theme';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function EmployeeEdit() {
+  const { accessToken, refreshToken } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const { employeeNumber } = useParams();
 
   const { isLoading, data } = useQuery<IGetEmployee, IErrorResponse>({
     queryKey: ['employee'],
-    queryFn: () => getEmployeeByEmployeeNumber(employeeNumber!),
+    queryFn: () =>
+      getEmployeeByEmployeeNumber(accessToken, refreshToken, employeeNumber!),
     enabled: employeeNumber !== undefined,
   });
 
@@ -71,6 +74,8 @@ export default function EmployeeEdit() {
   const editMutation = useMutation<IGetEmployee, IErrorResponse>({
     mutationFn: () =>
       editEmployeeByEmployeeNumber(
+        accessToken,
+        refreshToken,
         employeeNumber!,
         editName,
         editStartDate,

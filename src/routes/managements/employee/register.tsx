@@ -20,8 +20,10 @@ import { ICreateEmployeeRes } from '../../../types/employee';
 import { IErrorResponse } from '../../../types/common';
 import { createEmployee } from '../../../api/employees';
 import { primaryColor } from '../../../theme';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function EmployeeRegister() {
+  const { accessToken, refreshToken } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -45,7 +47,14 @@ export default function EmployeeRegister() {
 
   const registerMutation = useMutation<ICreateEmployeeRes, IErrorResponse>({
     mutationFn: () =>
-      createEmployee(employeeNumber, name, startDate, resignationDate),
+      createEmployee(
+        accessToken,
+        refreshToken,
+        employeeNumber,
+        name,
+        startDate,
+        resignationDate
+      ),
     onSuccess: () => {
       toast({
         title: `등록 완료`,
@@ -89,7 +98,7 @@ export default function EmployeeRegister() {
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={'semibold'} fontSize={'2xl'}>
-          사원 등록
+          사원 등록
         </Text>
       </Box>
       <HStack justifyContent={'space-between'}>

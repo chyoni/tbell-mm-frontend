@@ -1,7 +1,7 @@
-import { IResponse } from "./common";
-import { IEmployee } from "./employee";
-import { IGetData } from "./pagable";
-import { IProject, IProjectNotPrices } from "./project";
+import { IResponse } from './common';
+import { IEmployee } from './employee';
+import { IGetData } from './pagable';
+import { IProject, IProjectNotPrices } from './project';
 
 export interface ICreateEmployeeHistoryRes extends IResponse {
   data: {
@@ -45,11 +45,15 @@ export interface IGetEmployeeHistories extends IResponse {
 }
 
 export interface IAddHistoryManMonthPayload {
+  accessToken: string | null;
+  refreshToken: string | null;
   historyId: string;
   payload: ManMonth[];
 }
 
 export interface ICompleteHistoryPayload {
+  accessToken: string | null;
+  refreshToken: string | null;
   historyId: string;
   endDate: string;
 }

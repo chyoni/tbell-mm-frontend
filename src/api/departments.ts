@@ -1,28 +1,39 @@
-import { ICRUDDepartmentRes, IGetDepartments } from "../types/department";
-import { instance } from "./instance";
+import { ICRUDDepartmentRes, IGetDepartments } from '../types/department';
+import { instance } from './instance';
 
 export const getDepartments = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   page: number = 0,
   size: number = 100,
   departmentName?: string
 ): Promise<IGetDepartments> =>
   instance
-    .get("departments", {
+    .get('departments', {
+      headers: { 'Access-Token': accessToken },
       params: {
         page,
         size,
         ...(departmentName !== undefined &&
-          departmentName !== "" && { departmentName }),
+          departmentName !== '' && { departmentName }),
       },
     })
     .then((res) => res.data);
 
 export const deleteDepartment = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   departmentName: string
 ): Promise<ICRUDDepartmentRes> =>
-  instance.delete(`departments/${departmentName}`).then((res) => res.data);
+  instance
+    .delete(`departments/${departmentName}`, {
+      headers: { 'Access-Token': accessToken },
+    })
+    .then((res) => res.data);
 
 export const editDepartment = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   departmentName: string,
   updateDepartmentName: string
 ): Promise<ICRUDDepartmentRes> =>
@@ -30,17 +41,29 @@ export const editDepartment = async (
     .put(
       `departments/${departmentName}`,
       { name: updateDepartmentName },
-      { headers: { "Content-Type": "application/json" } }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Token': accessToken,
+        },
+      }
     )
     .then((res) => res.data);
 
 export const createDepartment = async (
+  accessToken: string | null,
+  refreshToken: string | null,
   name: string
 ): Promise<ICRUDDepartmentRes> =>
   instance
     .post(
       `departments`,
       { name },
-      { headers: { "Content-Type": "application/json" } }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Token': accessToken,
+        },
+      }
     )
     .then((res) => res.data);

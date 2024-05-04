@@ -32,8 +32,10 @@ import { getEmployees } from '../../api/employees';
 import { IGetProjectOptions, IGetProjects } from '../../types/project';
 import { getProjects, getProjectsForOptions } from '../../api/projects';
 import { ResponsiveLine, Serie } from '@nivo/line';
+import { useAuth } from '../../context/\bauth-context';
 
 export default function Home() {
+  const { accessToken, refreshToken } = useAuth();
   const [year, setYear] = useState<string>(new Date().getFullYear().toString());
   const [statisticsYear, setStatisticsYear] = useState<string>(
     new Date().getFullYear().toString()
@@ -54,7 +56,7 @@ export default function Home() {
     IErrorResponse
   >({
     queryKey: ['statistics'],
-    queryFn: () => getHistoryStatistics(year),
+    queryFn: () => getHistoryStatistics(accessToken, refreshToken, year),
   });
 
   const { isLoading: employeesLoading, data: employeesData } = useQuery<
@@ -62,7 +64,7 @@ export default function Home() {
     IErrorResponse
   >({
     queryKey: ['employees'],
-    queryFn: () => getEmployees(0, 10),
+    queryFn: () => getEmployees(accessToken, refreshToken, 0, 10),
   });
 
   const { isLoading: projectsLoading, data: projectsData } = useQuery<
@@ -70,7 +72,7 @@ export default function Home() {
     Error
   >({
     queryKey: ['projects'],
-    queryFn: () => getProjects(0, 10),
+    queryFn: () => getProjects(accessToken, refreshToken, 0, 10),
   });
 
   const { isLoading: pOptionsLoading, data: pOptions } = useQuery<
@@ -78,7 +80,7 @@ export default function Home() {
     IErrorResponse
   >({
     queryKey: ['projectsOptions'],
-    queryFn: () => getProjectsForOptions(),
+    queryFn: () => getProjectsForOptions(accessToken, refreshToken),
   });
 
   useEffect(() => {
@@ -106,7 +108,13 @@ export default function Home() {
     refetch: contractStatisticsRefetch,
   } = useQuery<IGetContractStatisticsRes, IErrorResponse>({
     queryKey: ['statisticsByProjectTotal'],
-    queryFn: () => getContractHistory(contract?.value!, statisticsYear),
+    queryFn: () =>
+      getContractHistory(
+        accessToken,
+        refreshToken,
+        contract?.value!,
+        statisticsYear
+      ),
     enabled: contract !== undefined,
   });
 

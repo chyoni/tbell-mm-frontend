@@ -20,8 +20,10 @@ import { ICRUDDepartmentRes } from '../../../types/department';
 import { IErrorResponse } from '../../../types/common';
 import { editDepartment } from '../../../api/departments';
 import { primaryColor } from '../../../theme';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function DepartmentEdit() {
+  const { accessToken, refreshToken } = useAuth();
   const { departmentName } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -50,7 +52,13 @@ export default function DepartmentEdit() {
   };
 
   const editMutation = useMutation<ICRUDDepartmentRes, IErrorResponse>({
-    mutationFn: () => editDepartment(departmentName!, updateDepartmentName!),
+    mutationFn: () =>
+      editDepartment(
+        accessToken,
+        refreshToken,
+        departmentName!,
+        updateDepartmentName!
+      ),
     onSuccess: () => {
       toast({
         title: `수정 완료`,

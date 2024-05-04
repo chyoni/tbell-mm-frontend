@@ -27,8 +27,10 @@ import { primaryColor } from '../../../theme';
 import { IGetEmployees } from '../../../types/employee';
 import { getEmployees } from '../../../api/employees';
 import { convertLevelEnToKo } from '../../../utils';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function ProjectStatisticsAddEmployee() {
+  const { accessToken, refreshToken } = useAuth();
   const { contractNumber } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -38,7 +40,7 @@ export default function ProjectStatisticsAddEmployee() {
     IErrorResponse
   >({
     queryKey: ['project', contractNumber],
-    queryFn: () => getProject(contractNumber!),
+    queryFn: () => getProject(accessToken, refreshToken, contractNumber!),
     enabled: contractNumber !== undefined,
   });
 
@@ -47,7 +49,7 @@ export default function ProjectStatisticsAddEmployee() {
     IErrorResponse
   >({
     queryKey: ['employees'],
-    queryFn: () => getEmployees(0, 2000),
+    queryFn: () => getEmployees(accessToken, refreshToken, 0, 2000),
     refetchOnWindowFocus: false,
   });
 
@@ -153,6 +155,8 @@ export default function ProjectStatisticsAddEmployee() {
   >({
     mutationFn: () =>
       addEmployeeHistory(
+        accessToken,
+        refreshToken,
         employee!.value,
         contractNumber!,
         startDate,

@@ -13,26 +13,28 @@ import {
   Grid,
   Box,
   Text,
-} from "@chakra-ui/react";
-import React from "react";
-import { Helmet } from "react-helmet-async";
-import { NumericFormat } from "react-number-format";
-import { primaryColor } from "../../../theme";
-import { convertLevelEnToKo } from "../../../utils";
-import { useNavigate, useParams } from "react-router-dom";
-import { getProject } from "../../../api/projects";
-import { IGetProject } from "../../../types/project";
-import { useQuery } from "@tanstack/react-query";
-import { IErrorResponse } from "../../../types/common";
+} from '@chakra-ui/react';
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { NumericFormat } from 'react-number-format';
+import { primaryColor } from '../../../theme';
+import { convertLevelEnToKo } from '../../../utils';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getProject } from '../../../api/projects';
+import { IGetProject } from '../../../types/project';
+import { useQuery } from '@tanstack/react-query';
+import { IErrorResponse } from '../../../types/common';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function ProjectDetails() {
+  const { accessToken, refreshToken } = useAuth();
   const navigate = useNavigate();
 
   const { contractNumber } = useParams();
 
   const { isLoading, data } = useQuery<IGetProject, IErrorResponse>({
-    queryKey: ["project", contractNumber],
-    queryFn: () => getProject(contractNumber!),
+    queryKey: ['project', contractNumber],
+    queryFn: () => getProject(accessToken, refreshToken, contractNumber!),
     enabled: contractNumber !== undefined,
   });
 
@@ -42,14 +44,14 @@ export default function ProjectDetails() {
         <title>{`프로젝트 - ${contractNumber}`}</title>
       </Helmet>
       <Box marginBottom={1}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
-          프로젝트 정보
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
+          프로젝트 정보
         </Text>
       </Box>
-      <HStack justifyContent={"space-between"}>
+      <HStack justifyContent={'space-between'}>
         <Button
-          variant={"ghost"}
-          size={"sm"}
+          variant={'ghost'}
+          size={'sm'}
           colorScheme="teal"
           onClick={() => navigate(-1)}
         >
@@ -57,11 +59,11 @@ export default function ProjectDetails() {
         </Button>
       </HStack>
       {
-        <Skeleton isLoaded={!isLoading} height={"50%"} fadeDuration={1.6}>
+        <Skeleton isLoaded={!isLoading} height={'50%'} fadeDuration={1.6}>
           {data && data.ok && (
             <HStack marginTop={10}>
-              <Flex w={"100%"}>
-                <Box flex={1} w={"50%"} h={"100%"}>
+              <Flex w={'100%'}>
+                <Box flex={1} w={'50%'} h={'100%'}>
                   <VStack p={2}>
                     <FormControl marginTop={2} isReadOnly isRequired>
                       <FormLabel>계약번호</FormLabel>
@@ -70,7 +72,7 @@ export default function ProjectDetails() {
                         type="text"
                         value={data?.data.contractNumber}
                         focusBorderColor={primaryColor}
-                        userSelect={"none"}
+                        userSelect={'none'}
                       />
                     </FormControl>
 
@@ -81,18 +83,18 @@ export default function ProjectDetails() {
                         type="text"
                         value={data.data.contractor}
                         focusBorderColor={primaryColor}
-                        userSelect={"none"}
+                        userSelect={'none'}
                       />
                     </FormControl>
 
                     <FormControl marginTop={2} isRequired isReadOnly>
                       <FormLabel>부서</FormLabel>
                       <ChakraSelect
-                        variant={"flushed"}
+                        variant={'flushed'}
                         disabled
                         focusBorderColor={primaryColor}
                         value={data.data.departmentName}
-                        userSelect={"none"}
+                        userSelect={'none'}
                       >
                         <option>{data.data.departmentName}</option>
                       </ChakraSelect>
@@ -105,7 +107,7 @@ export default function ProjectDetails() {
                         type="text"
                         value={data.data.teamName}
                         focusBorderColor={primaryColor}
-                        userSelect={"none"}
+                        userSelect={'none'}
                       />
                     </FormControl>
 
@@ -113,12 +115,12 @@ export default function ProjectDetails() {
                       <FormLabel>상태</FormLabel>
                       <RadioGroup
                         defaultValue={data.data.projectStatus}
-                        colorScheme={"teal"}
-                        userSelect={"none"}
+                        colorScheme={'teal'}
+                        userSelect={'none'}
                       >
                         <HStack>
-                          <Radio value={"YEAR"}>연간</Radio>
-                          <Radio value={"SINGLE"}>단건</Radio>
+                          <Radio value={'YEAR'}>연간</Radio>
+                          <Radio value={'SINGLE'}>단건</Radio>
                         </HStack>
                       </RadioGroup>
                     </FormControl>
@@ -127,19 +129,19 @@ export default function ProjectDetails() {
                       <FormLabel>가동률</FormLabel>
                       <RadioGroup
                         defaultValue={data.data.operationRate}
-                        colorScheme={"teal"}
+                        colorScheme={'teal'}
                       >
                         <HStack>
-                          <Radio value={"INCLUDE"}>포함</Radio>
-                          <Radio value={"EXCEPT"}>제외</Radio>
+                          <Radio value={'INCLUDE'}>포함</Radio>
+                          <Radio value={'EXCEPT'}>제외</Radio>
                         </HStack>
                       </RadioGroup>
                     </FormControl>
                   </VStack>
                 </Box>
-                <Box flex={1} w={"50%"} h={"100%"}>
+                <Box flex={1} w={'50%'} h={'100%'}>
                   <VStack p={2}>
-                    <Flex w={"100%"}>
+                    <Flex w={'100%'}>
                       <FormControl
                         marginTop={2}
                         marginRight={5}
@@ -166,36 +168,36 @@ export default function ProjectDetails() {
                       </FormControl>
                     </Flex>
 
-                    <Box w={"100%"}>
+                    <Box w={'100%'}>
                       <FormControl isRequired isReadOnly>
                         <FormLabel>설정단가</FormLabel>
                         <Grid
-                          templateColumns={"repeat(4, 1fr)"}
+                          templateColumns={'repeat(4, 1fr)'}
                           gap={5}
-                          w={"100%"}
+                          w={'100%'}
                           marginTop={5}
                         >
                           {data.data.unitPrices.map((up) => {
                             return Object.entries(up).map((keyValue, index) => (
                               <Flex
                                 key={index}
-                                w={"100%"}
-                                flexDirection={"column"}
-                                border={"ButtonShadow"}
-                                borderStyle={"outset"}
+                                w={'100%'}
+                                flexDirection={'column'}
+                                border={'ButtonShadow'}
+                                borderStyle={'outset'}
                                 borderWidth={1}
                                 borderRadius={5}
                                 borderColor={primaryColor}
                                 p={2}
                               >
                                 <Box>
-                                  <Text fontWeight={"bold"}>
+                                  <Text fontWeight={'bold'}>
                                     {convertLevelEnToKo(keyValue[0])}
                                   </Text>
                                   <NumericFormat
                                     value={keyValue[1]}
                                     displayType="text"
-                                    thousandSeparator={","}
+                                    thousandSeparator={','}
                                     className="text-xl font-thin"
                                   />
                                 </Box>

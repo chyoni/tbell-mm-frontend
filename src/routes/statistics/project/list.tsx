@@ -14,17 +14,19 @@ import {
   Th,
   Thead,
   Tr,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
-import { Helmet } from "react-helmet-async";
-import { primaryColor } from "../../../theme";
-import Pagination from "../../../components/pagination";
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { IGetProjects } from "../../../types/project";
-import { getProjects } from "../../../api/projects";
+} from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { primaryColor } from '../../../theme';
+import Pagination from '../../../components/pagination';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { IGetProjects } from '../../../types/project';
+import { getProjects } from '../../../api/projects';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function ProjectStatisticsList() {
+  const { accessToken, refreshToken } = useAuth();
   const [page, setPage] = useState<number>(0);
   // 첫번째 페이지 Function
   const goToFirstPage = () => setPage(0);
@@ -37,19 +39,27 @@ export default function ProjectStatisticsList() {
   // 특정 페이지 지정 Function
   const goToSpecificPage = (page: number) => setPage(page);
 
-  const [searchTeamName, setSearchTeamName] = useState<string>("");
+  const [searchTeamName, setSearchTeamName] = useState<string>('');
 
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>
   ) => {
-    if (e.key === "Enter") searchByCond();
+    if (e.key === 'Enter') searchByCond();
   };
 
   const searchByCond = async () => await refetch();
 
   const { isLoading, data, refetch } = useQuery<IGetProjects, Error>({
-    queryKey: ["projects", page],
-    queryFn: () => getProjects(page, 10, undefined, searchTeamName),
+    queryKey: ['projects', page],
+    queryFn: () =>
+      getProjects(
+        accessToken,
+        refreshToken,
+        page,
+        10,
+        undefined,
+        searchTeamName
+      ),
   });
 
   return (
@@ -58,13 +68,13 @@ export default function ProjectStatisticsList() {
         <title>프로젝트별 사원 투입현황</title>
       </Helmet>
       <Box marginBottom={5}>
-        <Text fontWeight={"semibold"} fontSize={"2xl"}>
+        <Text fontWeight={'semibold'} fontSize={'2xl'}>
           프로젝트별 사원 투입현황 - 프로젝트 리스트
         </Text>
       </Box>
       <HStack marginBottom={5} spacing={8}>
-        <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-          <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
+        <Box width={'min-content'} alignItems={'center'} display={'flex'}>
+          <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
             팀명
           </Text>
           <Input
@@ -80,7 +90,7 @@ export default function ProjectStatisticsList() {
         </Box>
         <Button
           colorScheme="teal"
-          size={"sm"}
+          size={'sm'}
           onClick={searchByCond}
           onKeyUp={handleKeyUp}
         >
@@ -89,23 +99,23 @@ export default function ProjectStatisticsList() {
       </HStack>
       <Skeleton
         isLoaded={!isLoading}
-        height={"50%"}
+        height={'50%'}
         fadeDuration={1.6}
         speed={5}
       >
         {data && !data.ok && data.errorMessage && (
           <Center>
-            <Text fontSize={"xx-large"} fontWeight={600}>
+            <Text fontSize={'xx-large'} fontWeight={600}>
               Oops!
             </Text>
-            <Text mt={2} fontSize={"large"}>
+            <Text mt={2} fontSize={'large'}>
               {data.errorMessage}
             </Text>
           </Center>
         )}
         {data && data.ok && (
           <TableContainer>
-            <Table size={"sm"}>
+            <Table size={'sm'}>
               <TableCaption>
                 <Pagination
                   totalPages={data.data.totalPages}
@@ -119,8 +129,8 @@ export default function ProjectStatisticsList() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th w={"90%"}>팀명</Th>
-                  <Th w={"20%"}>작업</Th>
+                  <Th w={'90%'}>팀명</Th>
+                  <Th w={'20%'}>작업</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -129,10 +139,10 @@ export default function ProjectStatisticsList() {
                     <Td>{p.teamName}</Td>
                     <Td>
                       <HStack spacing={2}>
-                        <Button size={"xs"} colorScheme="teal">
+                        <Button size={'xs'} colorScheme="teal">
                           <Link to={`${p.contractNumber}`}>투입 현황</Link>
                         </Button>
-                        <Button size={"xs"} colorScheme="teal">
+                        <Button size={'xs'} colorScheme="teal">
                           <Link to={`${p.contractNumber}/employee`}>
                             인력 투입
                           </Link>

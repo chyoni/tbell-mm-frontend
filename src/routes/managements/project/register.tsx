@@ -35,8 +35,10 @@ import {
   IUnitPrice,
 } from '../../../types/project';
 import { createProject } from '../../../api/projects';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function ProjectRegister() {
+  const { accessToken, refreshToken } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -45,7 +47,7 @@ export default function ProjectRegister() {
     Error
   >({
     queryKey: ['departments'],
-    queryFn: () => getDepartments(),
+    queryFn: () => getDepartments(accessToken, refreshToken),
   });
 
   const [pStatus, setPStatus] = useState<'YEAR' | 'SINGLE'>('YEAR');
@@ -173,6 +175,8 @@ export default function ProjectRegister() {
   >({
     mutationFn: () =>
       createProject(
+        accessToken,
+        refreshToken,
         contractNumber,
         teamName,
         contractor,
@@ -222,7 +226,7 @@ export default function ProjectRegister() {
       </Helmet>
       <Box marginBottom={1}>
         <Text fontWeight={'semibold'} fontSize={'2xl'}>
-          프로젝트 등록
+          프로젝트 등록
         </Text>
       </Box>
       <HStack justifyContent={'space-between'}>

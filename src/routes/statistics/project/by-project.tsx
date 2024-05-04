@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -21,33 +21,34 @@ import {
   Text,
   useDisclosure,
   useToast,
-} from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+} from '@chakra-ui/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   IAddHistoryManMonthPayload,
   ICompleteHistoryPayload,
   ICompleteHistoryRes,
   IEmployeeHistory,
   IGetEmployeeHistories,
-} from "../../../types/employee-history";
-import { IErrorResponse } from "../../../types/common";
+} from '../../../types/employee-history';
+import { IErrorResponse } from '../../../types/common';
 import {
   completeHistory,
   getEmployeeHistory,
   saveHistoryManMonths,
-} from "../../../api/employee-history";
-import { Helmet } from "react-helmet-async";
-import { primaryColor, titleColor } from "../../../theme";
-import { useNavigate, useParams } from "react-router-dom";
-import { IGetProject } from "../../../types/project";
-import { getProject } from "../../../api/projects";
-import { FaArrowLeft } from "react-icons/fa6";
-import NoContent from "../../../components/no-content";
-import { convertLevelEnToKo } from "../../../utils";
-import { NumericFormat } from "react-number-format";
-import Pagination from "../../../components/pagination";
-import { IGetContractStatisticsRes } from "../../../types/statistics";
-import { getContractHistory } from "../../../api/statistics";
+} from '../../../api/employee-history';
+import { Helmet } from 'react-helmet-async';
+import { primaryColor, titleColor } from '../../../theme';
+import { useNavigate, useParams } from 'react-router-dom';
+import { IGetProject } from '../../../types/project';
+import { getProject } from '../../../api/projects';
+import { FaArrowLeft } from 'react-icons/fa6';
+import NoContent from '../../../components/no-content';
+import { convertLevelEnToKo } from '../../../utils';
+import { NumericFormat } from 'react-number-format';
+import Pagination from '../../../components/pagination';
+import { IGetContractStatisticsRes } from '../../../types/statistics';
+import { getContractHistory } from '../../../api/statistics';
+import { useAuth } from '../../../context/\bauth-context';
 
 export function getCopyEmployeeHistoryStateAndIndex(
   employeeHistory: IEmployeeHistory[],
@@ -74,13 +75,14 @@ export function getCopyEmployeeHistoryStateAndIndex(
 }
 
 export default function ByProjectStatistics() {
+  const { accessToken, refreshToken } = useAuth();
   const toast = useToast();
   const { contractNumber } = useParams();
   const navigate = useNavigate();
   const [searchYear, setSearchYear] = useState<string>(
     new Date().getFullYear().toString()
   );
-  const [searchEmployeeName, setSearchEmployeeName] = useState<string>("");
+  const [searchEmployeeName, setSearchEmployeeName] = useState<string>('');
 
   const [page, setPage] = useState<number>(0);
   // 첫번째 페이지 Function
@@ -98,8 +100,8 @@ export default function ByProjectStatistics() {
     IGetProject,
     IErrorResponse
   >({
-    queryKey: ["project"],
-    queryFn: () => getProject(contractNumber!),
+    queryKey: ['project'],
+    queryFn: () => getProject(accessToken, refreshToken, contractNumber!),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
   });
@@ -108,9 +110,16 @@ export default function ByProjectStatistics() {
     IGetEmployeeHistories,
     IErrorResponse
   >({
-    queryKey: ["employeeHistory", page],
+    queryKey: ['employeeHistory', page],
     queryFn: () =>
-      getEmployeeHistory(page, contractNumber, searchYear, searchEmployeeName),
+      getEmployeeHistory(
+        accessToken,
+        refreshToken,
+        page,
+        contractNumber,
+        searchYear,
+        searchEmployeeName
+      ),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
   });
@@ -119,8 +128,15 @@ export default function ByProjectStatistics() {
     IGetContractStatisticsRes,
     IErrorResponse
   >({
-    queryKey: ["statisticsByProject"],
-    queryFn: () => getContractHistory(contractNumber!, searchYear, true),
+    queryKey: ['statisticsByProject'],
+    queryFn: () =>
+      getContractHistory(
+        accessToken,
+        refreshToken,
+        contractNumber!,
+        searchYear,
+        true
+      ),
     enabled: contractNumber !== undefined,
     refetchOnWindowFocus: false,
   });
@@ -128,7 +144,7 @@ export default function ByProjectStatistics() {
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>
   ) => {
-    if (e.key === "Enter") searchByCond();
+    if (e.key === 'Enter') searchByCond();
   };
 
   const searchByCond = async () => {
@@ -162,7 +178,7 @@ export default function ByProjectStatistics() {
           */
 
           // 기존값을 지우는 방식
-          salaryInputValues[`${history.id}-${mm.id}`] = "";
+          salaryInputValues[`${history.id}-${mm.id}`] = '';
         });
       });
 
@@ -178,7 +194,7 @@ export default function ByProjectStatistics() {
           */
 
           // 기존값을 지우는 방식
-          calculateInputValues[`cal-${history.id}-${mm.id}`] = "";
+          calculateInputValues[`cal-${history.id}-${mm.id}`] = '';
         });
       });
 
@@ -194,7 +210,7 @@ export default function ByProjectStatistics() {
     manMonthId: number
   ) => {
     // 급여 입력 필드값
-    const salary = +event.target.value.replaceAll(",", "");
+    const salary = +event.target.value.replaceAll(',', '');
 
     const {
       updatedEmployeeHistory,
@@ -243,7 +259,7 @@ export default function ByProjectStatistics() {
 
     const copySalaryInputs = salaryInputs;
     copySalaryInputs[`${employeeHistoryId}-${manMonthId}`] =
-      salary.toString() === "0" ? "" : salary.toString();
+      salary.toString() === '0' ? '' : salary.toString();
     setSalaryInputs(copySalaryInputs);
   };
 
@@ -301,11 +317,16 @@ export default function ByProjectStatistics() {
     IAddHistoryManMonthPayload
   >({
     mutationFn: (variables: IAddHistoryManMonthPayload) =>
-      saveHistoryManMonths(variables.historyId, variables.payload),
+      saveHistoryManMonths(
+        variables.accessToken,
+        variables.refreshToken,
+        variables.historyId,
+        variables.payload
+      ),
     onSuccess: () => {
       toast({
         title: `등록 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -315,7 +336,7 @@ export default function ByProjectStatistics() {
       toast({
         title: `등록 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -328,11 +349,16 @@ export default function ByProjectStatistics() {
     ICompleteHistoryPayload
   >({
     mutationFn: (variables: ICompleteHistoryPayload) =>
-      completeHistory(variables.historyId, variables.endDate),
+      completeHistory(
+        variables.accessToken,
+        variables.refreshToken,
+        variables.historyId,
+        variables.endDate
+      ),
     onSuccess: () => {
       toast({
         title: `등록 완료`,
-        status: "success",
+        status: 'success',
         duration: 1500,
         isClosable: true,
       });
@@ -345,7 +371,7 @@ export default function ByProjectStatistics() {
       toast({
         title: `투입종료일 지정 실패`,
         description: `${error.response.data.errorMessage}`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -354,13 +380,13 @@ export default function ByProjectStatistics() {
 
   const handleCompleteHistory = () => {
     if (
-      makeEndDate === "" ||
+      makeEndDate === '' ||
       makeEndDate === null ||
       makeEndDate === undefined
     ) {
       toast({
         title: `투입종료일 지정이 되지 않았습니다.`,
-        status: "error",
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -373,6 +399,8 @@ export default function ByProjectStatistics() {
     )
       return;
     completeHistoryMutation.mutate({
+      accessToken,
+      refreshToken,
       historyId: selectedMakeEndDateHistory.id.toString(),
       endDate: makeEndDate,
     });
@@ -408,6 +436,8 @@ export default function ByProjectStatistics() {
     });
 
     addHistoryManMonthsMutation.mutate({
+      accessToken,
+      refreshToken,
       historyId: history.id.toString(),
       payload,
     });
@@ -425,12 +455,12 @@ export default function ByProjectStatistics() {
   const handlePopupPreSet = (emp: IEmployeeHistory) => {
     setSelectedMakeEndDateHistory(emp);
 
-    setMakeEndDate(emp.endDate ? emp.endDate : "");
+    setMakeEndDate(emp.endDate ? emp.endDate : '');
 
     onEndDateToggle();
   };
-  const [makeEndDate, setMakeEndDate] = useState<string>("");
-  const isMakeEndDateError = makeEndDate === undefined || makeEndDate === "";
+  const [makeEndDate, setMakeEndDate] = useState<string>('');
+  const isMakeEndDateError = makeEndDate === undefined || makeEndDate === '';
 
   const handleMakeEndDate = (e: ChangeEvent<HTMLInputElement>) => {
     setMakeEndDate(e.target.value);
@@ -442,29 +472,29 @@ export default function ByProjectStatistics() {
       </Helmet>
       <Skeleton
         isLoaded={!projectLoading && !isLoading && !statisticsLoading}
-        height={"50vh"}
+        height={'50vh'}
       >
         {/* 화면 상단 타이틀 */}
         <HStack marginBottom={5}>
           <Button
-            variant={"ghost"}
-            size={"sm"}
+            variant={'ghost'}
+            size={'sm'}
             colorScheme="teal"
             onClick={() => navigate(-1)}
           >
             <Icon as={FaArrowLeft} />
           </Button>
-          <Text fontWeight={"semibold"} fontSize={"2xl"}>
+          <Text fontWeight={'semibold'} fontSize={'2xl'}>
             {`[${projectData?.data.teamName}] 투입 현황`}
           </Text>
           <HStack>
-            <Text fontWeight={"hairline"}>
+            <Text fontWeight={'hairline'}>
               {projectData?.data.startDate
                 ? `(${projectData?.data.startDate}`
                 : `(미정`}
             </Text>
-            <Text fontWeight={"hairline"}>-</Text>
-            <Text fontWeight={"hairline"}>
+            <Text fontWeight={'hairline'}>-</Text>
+            <Text fontWeight={'hairline'}>
               {projectData?.data.endDate
                 ? `${projectData?.data.endDate})`
                 : `미정)`}
@@ -473,9 +503,9 @@ export default function ByProjectStatistics() {
           <HStack>
             <Text>|</Text>
             <HStack>
-              <Text fontWeight={"hairline"}>{`전체 투입 MM: `}</Text>
+              <Text fontWeight={'hairline'}>{`전체 투입 MM: `}</Text>
               <Text>{statisticsData?.data[0].totalInputManMonth}</Text>
-              <Text fontWeight={"hairline"}>{`전체 정산 MM: `}</Text>
+              <Text fontWeight={'hairline'}>{`전체 정산 MM: `}</Text>
               <Text>{statisticsData?.data[0].totalCalculateManMonth}</Text>
             </HStack>
           </HStack>
@@ -484,30 +514,30 @@ export default function ByProjectStatistics() {
 
         {/* 화면 상단 단가*/}
         <HStack marginBottom={5}>
-          <Flex direction={"column"}>
-            <Text fontWeight={"hairline"}>단가</Text>
+          <Flex direction={'column'}>
+            <Text fontWeight={'hairline'}>단가</Text>
             <HStack marginTop={2}>
               {projectData?.data.unitPrices.map((up) => {
                 return Object.entries(up).map((keyValue, index) => (
                   <Flex
                     key={index}
-                    w={"100%"}
-                    flexDirection={"column"}
-                    border={"Highlight"}
-                    borderStyle={"outset"}
+                    w={'100%'}
+                    flexDirection={'column'}
+                    border={'Highlight'}
+                    borderStyle={'outset'}
                     borderWidth={1}
                     borderRadius={5}
                     borderColor={primaryColor}
                     p={2}
                   >
                     <Box>
-                      <Text fontWeight={"bold"}>
+                      <Text fontWeight={'bold'}>
                         {convertLevelEnToKo(keyValue[0])}
                       </Text>
                       <NumericFormat
                         value={keyValue[1]}
                         displayType="text"
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="text-xl font-thin"
                       />
                     </Box>
@@ -521,8 +551,8 @@ export default function ByProjectStatistics() {
 
         {/* 검색 섹션 */}
         <HStack marginBottom={5} spacing={8}>
-          <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-            <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
+          <Box width={'min-content'} alignItems={'center'} display={'flex'}>
+            <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
               연도 (투입일 기준)
             </Text>
             <Input
@@ -536,8 +566,8 @@ export default function ByProjectStatistics() {
               onKeyUp={handleKeyUp}
             />
           </Box>
-          <Box width={"min-content"} alignItems={"center"} display={"flex"}>
-            <Text marginRight={2} fontWeight={"hairline"} width={"max-content"}>
+          <Box width={'min-content'} alignItems={'center'} display={'flex'}>
+            <Text marginRight={2} fontWeight={'hairline'} width={'max-content'}>
               사원명
             </Text>
             <Input
@@ -553,7 +583,7 @@ export default function ByProjectStatistics() {
           </Box>
           <Button
             colorScheme="teal"
-            size={"sm"}
+            size={'sm'}
             onClick={searchByCond}
             onKeyUp={handleKeyUp}
           >
@@ -582,36 +612,36 @@ export default function ByProjectStatistics() {
           employeeHistory.map((emp, index) => (
             <Flex
               key={index}
-              border={"ButtonShadow"}
+              border={'ButtonShadow'}
               borderColor={primaryColor}
-              borderStyle={"double"}
+              borderStyle={'double'}
               borderRadius={10}
               marginBottom={4}
             >
-              <HStack spacing={5} w={"30%"}>
+              <HStack spacing={5} w={'30%'}>
                 <Flex
-                  direction={"column"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  w={"30%"}
+                  direction={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  w={'30%'}
                   py={6}
                   px={2}
                 >
                   <Button
-                    fontSize={"small"}
-                    variant={"outline"}
+                    fontSize={'small'}
+                    variant={'outline'}
                     p={1}
-                    colorScheme={"teal"}
+                    colorScheme={'teal'}
                     onClick={() => handleSave(emp.id)}
                   >
                     변경사항 저장
                   </Button>
                   <Button
-                    fontSize={"small"}
+                    fontSize={'small'}
                     marginTop={2}
-                    variant={"outline"}
+                    variant={'outline'}
                     p={1}
-                    colorScheme={"red"}
+                    colorScheme={'red'}
                     onClick={() => {
                       handlePopupPreSet(emp);
                     }}
@@ -621,15 +651,15 @@ export default function ByProjectStatistics() {
                   <Modal
                     isOpen={isEndDateModalOpen}
                     onClose={onEndDateModalClose}
-                    size={"xl"}
+                    size={'xl'}
                   >
                     <ModalOverlay />
                     <ModalContent>
                       <ModalHeader>{`[${selectedMakeEndDateHistory?.project.teamName}] 투입종료일 지정`}</ModalHeader>
                       <ModalCloseButton />
                       <ModalBody>
-                        <Flex direction={"column"}>
-                          <Text fontWeight={"hairline"} fontSize={"x-large"}>
+                        <Flex direction={'column'}>
+                          <Text fontWeight={'hairline'} fontSize={'x-large'}>
                             {`${selectedMakeEndDateHistory?.employee.name}(${selectedMakeEndDateHistory?.employee.employeeNumber})`}
                           </Text>
                           <FormControl
@@ -659,7 +689,7 @@ export default function ByProjectStatistics() {
                       </ModalBody>
                       <ModalFooter>
                         <Button
-                          variant={"outline"}
+                          variant={'outline'}
                           mr={3}
                           onClick={onEndDateModalClose}
                         >
@@ -679,124 +709,124 @@ export default function ByProjectStatistics() {
                 </Flex>
 
                 <Flex
-                  direction={"column"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  w={"30%"}
+                  direction={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  w={'30%'}
                   py={6}
                   px={2}
                 >
-                  <Text fontSize={"small"} color={primaryColor}>
+                  <Text fontSize={'small'} color={primaryColor}>
                     사번
                   </Text>
-                  <Text fontSize={"small"}>{emp.employee.employeeNumber}</Text>
+                  <Text fontSize={'small'}>{emp.employee.employeeNumber}</Text>
                 </Flex>
 
                 <Flex
-                  direction={"column"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  w={"30%"}
+                  direction={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  w={'30%'}
                 >
-                  <Text fontSize={"small"} color={primaryColor}>
+                  <Text fontSize={'small'} color={primaryColor}>
                     이름
                   </Text>
-                  <Text fontSize={"small"}>{emp.employee.name}</Text>
+                  <Text fontSize={'small'}>{emp.employee.name}</Text>
                 </Flex>
 
-                <Box w={"60%"} px={2} py={6} mb={2}>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                <Box w={'60%'} px={2} py={6} mb={2}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       월 구분
                     </Text>
                   </Flex>
-                  <Flex h={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex h={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       실제 투입일
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       투입 MM
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       급여
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       투입 금액
                     </Text>
                   </Flex>
 
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       정산 MM
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       정산 등급
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       정산 금액
                     </Text>
                   </Flex>
-                  <Flex height={5} w={"100%"} justifyContent={"flex-end"}>
-                    <Text color={titleColor} fontSize={"smaller"}>
+                  <Flex height={5} w={'100%'} justifyContent={'flex-end'}>
+                    <Text color={titleColor} fontSize={'smaller'}>
                       손익액
                     </Text>
                   </Flex>
                 </Box>
               </HStack>
 
-              <HStack overflowX={"auto"} w={"70%"}>
+              <HStack overflowX={'auto'} w={'70%'}>
                 {emp.mms.map((month, index) => (
                   <Flex
                     key={index}
-                    direction={"column"}
+                    direction={'column'}
                     py={4}
                     px={2}
-                    borderStyle={"outset"}
+                    borderStyle={'outset'}
                     borderWidth={1}
-                    borderColor={"Background"}
+                    borderColor={'Background'}
                     mb={2}
-                    justifyContent={"flex-start"}
+                    justifyContent={'flex-start'}
                   >
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
                       height={5}
                     >
-                      <Text fontSize={"small"}>{`${month.month}월`}</Text>
+                      <Text fontSize={'small'}>{`${month.month}월`}</Text>
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"space-between"}
-                      w={"max-content"}
+                      alignItems={'center'}
+                      justifyContent={'space-between'}
+                      w={'max-content'}
                       height={5}
                     >
-                      <Text fontSize={"small"}>{month.durationStart}</Text>
+                      <Text fontSize={'small'}>{month.durationStart}</Text>
                       <Box mb={1}>
                         <Text mx={3}>⇢</Text>
                       </Box>
-                      <Text fontSize={"small"}>{month.durationEnd}</Text>
+                      <Text fontSize={'small'}>{month.durationEnd}</Text>
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <Text>{month.inputManMonth}</Text>
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <NumericFormat
                         value={
@@ -805,7 +835,7 @@ export default function ByProjectStatistics() {
                             : salaryInputs[`${emp.id}-${month.id}`]
                         }
                         allowNegative={false}
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="numeric-input h-4 rounded-md border border-inherit bg-inherit w-full text-center
                         focus:outline-none focus:border-2 focus:border-teal-500 transition-colors duration-200 box-border"
                         onChange={(event) =>
@@ -815,14 +845,14 @@ export default function ByProjectStatistics() {
                     </Flex>
 
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <NumericFormat
                         value={month.inputPrice ? month.inputPrice : 0}
                         displayType="text"
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="text-sm font-thin"
                       />
                     </Flex>
@@ -830,9 +860,9 @@ export default function ByProjectStatistics() {
                     <Box my={0.5}></Box>
 
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <NumericFormat
                         value={
@@ -851,35 +881,35 @@ export default function ByProjectStatistics() {
                       />
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <Text>{convertLevelEnToKo(month.calculateLevel)}</Text>
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <NumericFormat
                         value={month.calculatePrice ? month.calculatePrice : 0}
                         displayType="text"
                         decimalScale={0}
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="text-sm font-thin"
                       />
                     </Flex>
                     <Flex
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      fontSize={"small"}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      fontSize={'small'}
                     >
                       <NumericFormat
                         value={month.plPrice ? month.plPrice : 0}
                         displayType="text"
                         decimalScale={0}
-                        thousandSeparator={","}
+                        thousandSeparator={','}
                         className="text-sm font-thin"
                       />
                     </Flex>
@@ -905,7 +935,7 @@ export default function ByProjectStatistics() {
             goToSpecificPage={goToSpecificPage}
           />
         )}
-        <Box height={"20px"}></Box>
+        <Box height={'20px'}></Box>
         {/* 하단 페이징 버튼 끝 */}
       </Skeleton>
     </>

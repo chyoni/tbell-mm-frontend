@@ -20,8 +20,10 @@ import { ICRUDDepartmentRes } from '../../../types/department';
 import { IErrorResponse } from '../../../types/common';
 import { createDepartment } from '../../../api/departments';
 import { primaryColor } from '../../../theme';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function DepartmentRegister() {
+  const { accessToken, refreshToken } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -36,7 +38,8 @@ export default function DepartmentRegister() {
   };
 
   const registerMutation = useMutation<ICRUDDepartmentRes, IErrorResponse>({
-    mutationFn: () => createDepartment(departmentName),
+    mutationFn: () =>
+      createDepartment(accessToken, refreshToken, departmentName),
     onSuccess: () => {
       toast({
         title: `등록 완료`,

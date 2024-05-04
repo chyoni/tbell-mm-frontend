@@ -36,15 +36,17 @@ import { IErrorResponse, Option } from '../../../types/common';
 import { IoCloseCircleSharp } from 'react-icons/io5';
 import { getDepartments } from '../../../api/departments';
 import { editProject, getProject } from '../../../api/projects';
+import { useAuth } from '../../../context/\bauth-context';
 
 export default function ProjectEdit() {
+  const { accessToken, refreshToken } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const { contractNumber } = useParams();
 
   const { isLoading, data } = useQuery<IGetProject, Error>({
     queryKey: ['project', contractNumber],
-    queryFn: () => getProject(contractNumber!),
+    queryFn: () => getProject(accessToken, refreshToken, contractNumber!),
     enabled: contractNumber !== undefined,
   });
 
@@ -53,7 +55,7 @@ export default function ProjectEdit() {
     Error
   >({
     queryKey: ['departments'],
-    queryFn: () => getDepartments(),
+    queryFn: () => getDepartments(accessToken, refreshToken),
   });
 
   const [pStatus, setPStatus] = useState<'YEAR' | 'SINGLE'>();
@@ -150,6 +152,8 @@ export default function ProjectEdit() {
   >({
     mutationFn: () =>
       editProject(
+        accessToken,
+        refreshToken,
         contractNumber!,
         teamName,
         contractor,

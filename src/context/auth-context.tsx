@@ -6,10 +6,12 @@ import React, {
   useState,
 } from 'react';
 import { logAdminIn } from '../api/auth';
+import { AxiosError, HttpStatusCode } from 'axios';
 
 interface IAuthContext {
-  token: string | null;
-  login: (userData: ILoginData) => void;
+  accessToken: string | null;
+  refreshToken: string | null;
+  login: (userData: ILoginData) => Promise<HttpStatusCode>;
   logout: () => void;
 }
 
@@ -20,8 +22,11 @@ interface ILoginData {
 
 // Context 생성
 const AuthContext = createContext<IAuthContext>({
-  token: null,
-  login(ILoginData) {},
+  accessToken: null,
+  refreshToken: null,
+  login(ILoginData) {
+    return Promise.resolve(HttpStatusCode.Ok);
+  },
   logout() {},
 });
 
@@ -30,32 +35,46 @@ export const useAuth = () => useContext(AuthContext);
 
 // Provider 컴포넌트
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorage.getItem('token')
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   useEffect(() => {
     const jwt = localStorage.getItem('token');
     if (jwt) {
-      setToken(jwt);
+      setAccessToken(jwt);
     }
   }, []);
 
-  const login = async (userData: ILoginData) => {
-    const responseBody = await logAdminIn(userData.username, userData.password);
+  const login = async (userData: ILoginData): Promise<HttpStatusCode> => {
+    const res = await logAdminIn(userData.username, userData.password);
+    if (res instanceof AxiosError) {
+      return HttpStatusCode.Unauthorized;
+    }
 
-    const accessTokenKeyValue = responseBody.split(';')[0];
-    const refreshTokenKeyValue = responseBody.split(';')[1];
+    const accessTokenKeyValue = res.data.split(';')[0];
+    const refreshTokenKeyValue = res.data.split(';')[1];
 
-    const accessToken = accessTokenKeyValue.split('=')[1];
-    const refreshToken = refreshTokenKeyValue.split('=')[1];
+    const access = accessTokenKeyValue.split('=')[1];
+    const refresh = refreshTokenKeyValue.split('=')[1];
+
+    localStorage.setItem('token', access);
+
+    setAccessToken(access);
+    setRefreshToken(refresh);
+
+    return HttpStatusCode.Ok;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    setToken(null);
+    setAccessToken(null);
+    setRefreshToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
