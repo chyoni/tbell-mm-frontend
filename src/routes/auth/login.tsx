@@ -8,6 +8,8 @@ import {
   Input,
   FormErrorMessage,
   Center,
+  Box,
+  HStack,
 } from '@chakra-ui/react';
 import React, { ChangeEvent, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -52,10 +54,10 @@ export default function Login() {
         <title>{`로그인하세요`}</title>
       </Helmet>
       <Skeleton isLoaded={true} height={'50%'} fadeDuration={1.6}>
-        <Center p={30}>
+        <Center p={30} height={'100vh'}>
           <VStack
             p={20}
-            w={'40%'}
+            w={'30%'}
             borderStyle={'outset'}
             borderWidth={1}
             borderColor={'Background'}
@@ -67,10 +69,10 @@ export default function Login() {
               width={'max-content'}
               fontSize={'xx-large'}
             >
-              TBELL MMS
+              관리자이신가요?
             </Text>
             <FormControl marginTop={2} isRequired isInvalid={isUsernameError}>
-              <FormLabel>Username</FormLabel>
+              <FormLabel fontWeight={'hairline'}>Username</FormLabel>
               <Input
                 size="md"
                 type="text"
@@ -83,7 +85,7 @@ export default function Login() {
               )}
             </FormControl>
             <FormControl marginTop={2} isRequired isInvalid={isPasswordError}>
-              <FormLabel>Password</FormLabel>
+              <FormLabel fontWeight={'hairline'}>Password</FormLabel>
               <Input
                 size="md"
                 type="password"
@@ -101,14 +103,38 @@ export default function Login() {
                 {anyLoginError}
               </Text>
             )}
-            <Button
-              color={primaryColor}
-              size={'md'}
-              onClick={doLogin}
-              isDisabled={isUsernameError || isPasswordError}
-            >
-              로그인
-            </Button>
+            <VStack>
+              <Button
+                color={primaryColor}
+                size={'md'}
+                onClick={doLogin}
+                isDisabled={isUsernameError || isPasswordError}
+              >
+                Login
+              </Button>
+              <HStack w={'100%'}>
+                <Box
+                  w={'45%'}
+                  borderWidth={1}
+                  borderStyle={'dashed'}
+                  h={'1px'}
+                  borderColor={'grey'}
+                ></Box>
+                <Text w={'10%'} fontWeight={'hairline'} textAlign={'center'}>
+                  OR
+                </Text>
+                <Box
+                  w={'45%'}
+                  borderWidth={1}
+                  borderStyle={'dashed'}
+                  h={'1px'}
+                  borderColor={'grey'}
+                ></Box>
+              </HStack>
+              <Text fontWeight={'hairline'}>
+                관리자 권한의 계정 부여는 담당자에게 문의하세요.
+              </Text>
+            </VStack>
           </VStack>
         </Center>
       </Skeleton>
