@@ -5,7 +5,6 @@ import { Outlet } from 'react-router-dom';
 
 const AuthWrapper = () => {
   const { accessToken } = useAuth();
-  console.log(accessToken);
   if (!accessToken) {
     return <Login />;
   }
